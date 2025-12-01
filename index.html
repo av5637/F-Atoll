@@ -141,8 +141,6 @@
             direction: rtl;
             font-size: 1.1rem;
             line-height: 1.8;
-            white-space: pre-wrap;
-            word-wrap: break-word;
         }
         
         .dhivehi-input {
@@ -238,11 +236,6 @@
         .log-message {
             margin-bottom: 10px;
             word-break: break-word;
-            white-space: pre-wrap;
-            padding: 8px;
-            background-color: white;
-            border-radius: 6px;
-            border: 1px solid #eee;
         }
         
         .message-language {
@@ -271,72 +264,14 @@
             color: white;
         }
         
-        .copy-btn:hover {
-            background-color: #2d8c47;
-        }
-        
         .edit-btn {
             background-color: #fbbc05;
             color: white;
         }
         
-        .edit-btn:hover {
-            background-color: #d8a204;
-        }
-        
         .delete-btn {
             background-color: #ea4335;
             color: white;
-        }
-        
-        .delete-btn:hover {
-            background-color: #d3382c;
-        }
-        
-        .quick-copy-section {
-            display: flex;
-            gap: 5px;
-            margin-top: 5px;
-            flex-wrap: wrap;
-        }
-        
-        .quick-copy-btn {
-            padding: 4px 8px;
-            background-color: #e8f0fe;
-            color: #1a73e8;
-            border: 1px solid #d2e3fc;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .quick-copy-btn:hover {
-            background-color: #d2e3fc;
-        }
-        
-        .message-display {
-            position: relative;
-            margin-bottom: 8px;
-        }
-        
-        .copy-message-btn {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background-color: rgba(52, 168, 83, 0.9);
-            color: white;
-            border: none;
-            border-radius: 3px;
-            padding: 4px 8px;
-            font-size: 0.7rem;
-            cursor: pointer;
-            opacity: 0.8;
-            transition: opacity 0.2s;
-        }
-        
-        .copy-message-btn:hover {
-            opacity: 1;
         }
         
         .empty-state {
@@ -433,13 +368,9 @@
             .dhivehi-text, .dhivehi-input {
                 font-size: 1rem;
             }
-            
-            .log-actions {
-                flex-wrap: wrap;
-            }
         }
     </style>
-    <!-- Dhivehi Fonts -->
+    <!-- Dhivehi Faruma Font -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic&display=swap" rel="stylesheet">
     <style>
         @font-face {
@@ -949,6 +880,18 @@
             
             taskLogContainer.innerHTML = filteredTasks.map(log => {
                 const timestamp = new Date(log.timestamp).toLocaleString();
+                let messageHtml = '';
+                if (log.messageEn && log.messageDv) {
+                    messageHtml = `
+                        <div class="log-message">${escapeHtml(log.messageEn)}</div>
+                        <div class="log-message dhivehi-text">${escapeHtml(log.messageDv)}</div>
+                    `;
+                } else if (log.messageEn) {
+                    messageHtml = `<div class="log-message">${escapeHtml(log.messageEn)}</div>`;
+                } else if (log.messageDv) {
+                    messageHtml = `<div class="log-message dhivehi-text">${escapeHtml(log.messageDv)}</div>`;
+                }
+                
                 return `
                     <div class="log-item">
                         <div class="log-header">
@@ -956,14 +899,9 @@
                             <span class="timestamp">${timestamp}</span>
                         </div>
                         <div class="service-number">Service Number: ${escapeHtml(log.serviceNumber)}</div>
-                        ${getMessageDisplay(log.messageEn, log.messageDv)}
-                        <div class="quick-copy-section">
-                            <button class="quick-copy-btn" onclick="copyToClipboard('${escapeHtml(log.messageEn || '')}', '${escapeHtml(log.messageDv || '')}', 'Both')">Copy Both</button>
-                            ${log.messageEn ? `<button class="quick-copy-btn" onclick="copyToClipboard('${escapeHtml(log.messageEn)}', '', 'English')">Copy English</button>` : ''}
-                            ${log.messageDv ? `<button class="quick-copy-btn" onclick="copyToClipboard('', '${escapeHtml(log.messageDv)}', 'Dhivehi')">Copy Dhivehi</button>` : ''}
-                            <button class="quick-copy-btn" onclick="copyToClipboard('${escapeHtml(log.island)} - ${escapeHtml(log.serviceNumber)} - ${timestamp}', '', 'Details')">Copy Details</button>
-                        </div>
+                        ${messageHtml}
                         <div class="log-actions">
+                            <button class="action-btn copy-btn" onclick="copyToClipboard('${escapeHtml(log.messageEn || '')}', '${escapeHtml(log.messageDv || '')}')">Copy</button>
                             <button class="action-btn edit-btn" onclick="openEditModal('${log.id}', 'task')">Edit</button>
                             <button class="action-btn delete-btn" onclick="deleteLog('${log.id}', 'task')">Delete</button>
                         </div>
@@ -1005,6 +943,18 @@
             
             operationLogContainer.innerHTML = filteredOperations.map(log => {
                 const timestamp = new Date(log.timestamp).toLocaleString();
+                let messageHtml = '';
+                if (log.messageEn && log.messageDv) {
+                    messageHtml = `
+                        <div class="log-message">${escapeHtml(log.messageEn)}</div>
+                        <div class="log-message dhivehi-text">${escapeHtml(log.messageDv)}</div>
+                    `;
+                } else if (log.messageEn) {
+                    messageHtml = `<div class="log-message">${escapeHtml(log.messageEn)}</div>`;
+                } else if (log.messageDv) {
+                    messageHtml = `<div class="log-message dhivehi-text">${escapeHtml(log.messageDv)}</div>`;
+                }
+                
                 return `
                     <div class="log-item">
                         <div class="log-header">
@@ -1012,14 +962,9 @@
                             <span class="timestamp">${timestamp}</span>
                         </div>
                         <div class="service-number">Service Number: ${escapeHtml(log.serviceNumber)}</div>
-                        ${getMessageDisplay(log.messageEn, log.messageDv)}
-                        <div class="quick-copy-section">
-                            <button class="quick-copy-btn" onclick="copyToClipboard('${escapeHtml(log.messageEn || '')}', '${escapeHtml(log.messageDv || '')}', 'Both')">Copy Both</button>
-                            ${log.messageEn ? `<button class="quick-copy-btn" onclick="copyToClipboard('${escapeHtml(log.messageEn)}', '', 'English')">Copy English</button>` : ''}
-                            ${log.messageDv ? `<button class="quick-copy-btn" onclick="copyToClipboard('', '${escapeHtml(log.messageDv)}', 'Dhivehi')">Copy Dhivehi</button>` : ''}
-                            <button class="quick-copy-btn" onclick="copyToClipboard('${escapeHtml(log.island)} - ${escapeHtml(log.serviceNumber)} - ${timestamp}', '', 'Details')">Copy Details</button>
-                        </div>
+                        ${messageHtml}
                         <div class="log-actions">
+                            <button class="action-btn copy-btn" onclick="copyToClipboard('${escapeHtml(log.messageEn || '')}', '${escapeHtml(log.messageDv || '')}')">Copy</button>
                             <button class="action-btn edit-btn" onclick="openEditModal('${log.id}', 'operation')">Edit</button>
                             <button class="action-btn delete-btn" onclick="deleteLog('${log.id}', 'operation')">Delete</button>
                         </div>
@@ -1028,74 +973,28 @@
             }).join('');
         }
         
-        // Get message display HTML with copy buttons
-        function getMessageDisplay(messageEn, messageDv) {
-            let html = '';
-            
-            if (messageEn && messageDv) {
-                html = `
-                    <div class="message-display">
-                        <div class="log-message">${escapeHtml(messageEn)}</div>
-                        <button class="copy-message-btn" onclick="copyToClipboard('${escapeHtml(messageEn)}', '', 'English')">Copy</button>
-                    </div>
-                    <div class="message-display">
-                        <div class="log-message dhivehi-text">${escapeHtml(messageDv)}</div>
-                        <button class="copy-message-btn" onclick="copyToClipboard('', '${escapeHtml(messageDv)}', 'Dhivehi')">Copy</button>
-                    </div>
-                `;
-            } else if (messageEn) {
-                html = `
-                    <div class="message-display">
-                        <div class="log-message">${escapeHtml(messageEn)}</div>
-                        <button class="copy-message-btn" onclick="copyToClipboard('${escapeHtml(messageEn)}', '', 'English')">Copy</button>
-                    </div>
-                `;
-            } else if (messageDv) {
-                html = `
-                    <div class="message-display">
-                        <div class="log-message dhivehi-text">${escapeHtml(messageDv)}</div>
-                        <button class="copy-message-btn" onclick="copyToClipboard('', '${escapeHtml(messageDv)}', 'Dhivehi')">Copy</button>
-                    </div>
-                `;
-            }
-            
-            return html;
-        }
-        
         // Escape HTML to prevent XSS
         function escapeHtml(text) {
             if (!text) return '';
             const div = document.createElement('div');
             div.textContent = text;
-            return div.innerHTML
-                .replace(/'/g, '&#39;')
-                .replace(/"/g, '&quot;')
-                .replace(/\n/g, '<br>');
+            return div.innerHTML;
         }
         
         // Copy message to clipboard
-        function copyToClipboard(messageEn, messageDv, type = 'Both') {
+        function copyToClipboard(messageEn, messageDv) {
             let textToCopy = '';
             
-            if (type === 'Both' && messageEn && messageDv) {
-                textToCopy = `${messageEn}\n\n---\n\n${messageDv}`;
-            } else if (type === 'Both' && messageEn) {
+            if (messageEn && messageDv) {
+                textToCopy = `${messageEn}\n\n${messageDv}`;
+            } else if (messageEn) {
                 textToCopy = messageEn;
-            } else if (type === 'Both' && messageDv) {
+            } else if (messageDv) {
                 textToCopy = messageDv;
-            } else if (type === 'English') {
-                textToCopy = messageEn;
-            } else if (type === 'Dhivehi') {
-                textToCopy = messageDv;
-            } else {
-                textToCopy = messageEn || messageDv;
             }
             
-            // Remove HTML tags if present
-            textToCopy = textToCopy.replace(/<br>/g, '\n').replace(/<[^>]*>/g, '');
-            
             navigator.clipboard.writeText(textToCopy).then(() => {
-                showToast(`${type} message copied to clipboard!`);
+                showToast('Message copied to clipboard!');
             }).catch(err => {
                 console.error('Failed to copy: ', err);
                 // Fallback for older browsers
@@ -1105,7 +1004,7 @@
                 textArea.select();
                 document.execCommand('copy');
                 document.body.removeChild(textArea);
-                showToast(`${type} message copied to clipboard!`);
+                showToast('Message copied to clipboard!');
             });
         }
         
