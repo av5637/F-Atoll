@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Island Task, Operation & Location Log</title>
+    <title>Island Task, Operation & Location Log - Login</title>
     
-    <!-- Firebase SDK - USING COMPATIBLE VERSION -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     
-    <!-- Font Awesome for icons -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -61,12 +62,194 @@
             color: var(--text-color);
             line-height: 1.6;
             transition: var(--transition);
-            display: flex;
             min-height: 100vh;
-            overflow-x: hidden;
         }
         
-        /* Sidebar Styles */
+        /* Login Container */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .login-card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .login-header h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+        
+        .login-header p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+        
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 2rem;
+        }
+        
+        .live-time {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: rgba(59, 130, 246, 0.1);
+            border-radius: 8px;
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            transition: var(--transition);
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        
+        .password-input {
+            position: relative;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-full {
+            width: 100%;
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-warning {
+            background-color: var(--warning-color);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+        
+        .btn-sm {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
+        
+        .dark-mode-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 10px;
+            cursor: pointer;
+            background-color: var(--bg-color);
+            border-radius: 20px;
+            transition: var(--transition);
+        }
+        
+        .dark-mode-toggle:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+        
+        .login-footer {
+            text-align: center;
+            margin-top: 25px;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+        
+        .login-footer .developer {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-top: 5px;
+        }
+        
+        /* Dashboard Styles (Initially Hidden) */
+        .dashboard {
+            display: none;
+        }
+        
         .sidebar {
             width: var(--sidebar-width);
             background-color: var(--sidebar-bg);
@@ -102,6 +285,42 @@
             font-size: 0.8rem;
             color: var(--sidebar-text);
             opacity: 0.8;
+        }
+        
+        .user-info {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .user-details {
+            flex: 1;
+        }
+        
+        .user-name {
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .user-role {
+            color: var(--sidebar-text);
+            font-size: 0.8rem;
+            margin-top: 2px;
         }
         
         .nav-menu {
@@ -147,13 +366,6 @@
             color: var(--sidebar-text);
         }
         
-        .sidebar-footer .developer {
-            margin-bottom: 10px;
-            color: var(--primary-color);
-            font-weight: 600;
-        }
-        
-        /* Sidebar Overlay for Mobile */
         .sidebar-overlay {
             position: fixed;
             top: 0;
@@ -172,7 +384,6 @@
             opacity: 1;
         }
         
-        /* Main Content */
         .main-content {
             flex: 1;
             margin-left: var(--sidebar-width);
@@ -186,7 +397,6 @@
             width: 100%;
         }
         
-        /* Header */
         .main-header {
             display: flex;
             justify-content: space-between;
@@ -213,29 +423,6 @@
             gap: 15px;
         }
         
-        /* Dark Mode Toggle */
-        .dark-mode-toggle {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            background-color: var(--card-bg);
-            padding: 8px 15px;
-            border-radius: 20px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            transition: var(--transition);
-        }
-        
-        .dark-mode-toggle:hover {
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-            transform: translateY(-2px);
-        }
-        
-        .dark-mode-toggle i {
-            margin-right: 8px;
-            font-size: 1.1rem;
-        }
-        
-        /* Hamburger Menu (for mobile) */
         .hamburger-menu {
             display: none;
             font-size: 1.5rem;
@@ -254,7 +441,6 @@
             transform: scale(1.05);
         }
         
-        /* Tab Content */
         .tab-content {
             display: none;
             background-color: var(--card-bg);
@@ -268,44 +454,6 @@
         
         .tab-content.active {
             display: block;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--text-color);
-        }
-        
-        select, textarea, input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 1rem;
-            background-color: var(--card-bg);
-            color: var(--text-color);
-            transition: var(--transition);
-        }
-        
-        select:focus, textarea:focus, input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-        }
-        
-        textarea {
-            min-height: 100px;
-            resize: vertical;
         }
         
         .language-tabs {
@@ -337,7 +485,6 @@
             display: block;
         }
         
-        /* Dhivehi Faruma Font Styles */
         .dhivehi-text {
             font-family: 'Faruma', 'Noto Sans Arabic', 'MV Typewriter', 'Mv Waheed', 'Mv Iyyu Nala', sans-serif;
             direction: rtl;
@@ -353,24 +500,20 @@
             text-align: right;
         }
         
-        .btn {
-            display: block;
+        select, textarea {
             width: 100%;
-            padding: 12px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
+            background-color: var(--card-bg);
+            color: var(--text-color);
             transition: var(--transition);
         }
         
-        .btn:hover {
-            background-color: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        textarea {
+            min-height: 100px;
+            resize: vertical;
         }
         
         .filter-section {
@@ -423,52 +566,15 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
         
-        .location-log-item {
-            border-left-color: var(--secondary-color);
-        }
-        
-        .operation-log-item {
-            border-left-color: var(--warning-color);
-        }
-        
         .log-header {
             display: flex;
             justify-content: space-between;
             margin-bottom: 10px;
         }
         
-        .island-name {
-            font-weight: 600;
-            color: var(--primary-color);
-        }
-        
-        .location-name {
-            font-weight: 600;
-            color: var(--secondary-color);
-            margin-bottom: 5px;
-        }
-        
         .timestamp {
             font-size: 0.85rem;
             color: var(--text-light);
-        }
-        
-        .service-number {
-            font-size: 0.9rem;
-            color: var(--text-light);
-            margin-bottom: 8px;
-        }
-        
-        .log-message {
-            margin-bottom: 10px;
-            word-break: break-word;
-        }
-        
-        .message-language {
-            font-size: 0.75rem;
-            color: var(--text-light);
-            margin-top: 5px;
-            font-style: italic;
         }
         
         .log-actions {
@@ -494,16 +600,6 @@
             color: white;
         }
         
-        .copy-location-btn {
-            background-color: var(--primary-color);
-            color: white;
-        }
-        
-        .copy-remarks-btn {
-            background-color: var(--danger-color);
-            color: white;
-        }
-        
         .edit-btn {
             background-color: var(--warning-color);
             color: white;
@@ -512,12 +608,6 @@
         .delete-btn {
             background-color: var(--danger-color);
             color: white;
-        }
-        
-        .action-btn:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
         }
         
         .empty-state {
@@ -538,7 +628,124 @@
             color: var(--text-light);
         }
         
-        /* Modal */
+        /* Admin Panel Styles */
+        .admin-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--text-color);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+        
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        
+        .users-table th,
+        .users-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .users-table th {
+            background-color: var(--bg-color);
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        
+        .user-status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background-color: rgba(52, 168, 83, 0.1);
+            color: var(--secondary-color);
+        }
+        
+        .status-inactive {
+            background-color: rgba(234, 67, 53, 0.1);
+            color: var(--danger-color);
+        }
+        
+        .action-icons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-icon {
+            cursor: pointer;
+            color: var(--text-light);
+            transition: var(--transition);
+            font-size: 1.1rem;
+        }
+        
+        .action-icon:hover {
+            color: var(--primary-color);
+        }
+        
+        .logout-btn {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .logout-btn:hover {
+            background-color: #d32f2f;
+        }
+        
         .modal {
             display: none;
             position: fixed;
@@ -561,11 +768,13 @@
         .modal-content {
             background-color: var(--card-bg);
             width: 90%;
-            max-width: 500px;
+            max-width: 600px;
             border-radius: 10px;
             padding: 20px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
             animation: slideInModal 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         
         @keyframes slideInModal {
@@ -578,10 +787,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 15px;
-        }
-        
-        .modal-header h2 {
-            color: var(--text-color);
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
         }
         
         .close-btn {
@@ -598,7 +805,6 @@
             transform: scale(1.1);
         }
         
-        /* Toast Notification */
         .toast {
             position: fixed;
             bottom: 20px;
@@ -620,7 +826,6 @@
             to { transform: translateX(-50%) translateY(0); opacity: 1; }
         }
         
-        /* Footer */
         .main-footer {
             text-align: center;
             padding: 20px;
@@ -630,13 +835,165 @@
             font-size: 0.9rem;
         }
         
-        .main-footer .developer {
-            color: var(--primary-color);
-            font-weight: 600;
-            margin-top: 5px;
+        /* Edit/Delete modal styles */
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: flex-end;
         }
         
-        /* Responsive Styles */
+        .data-actions {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .edit-data-btn, .delete-data-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .edit-data-btn {
+            background-color: var(--warning-color);
+            color: white;
+        }
+        
+        .delete-data-btn {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .edit-data-btn:hover, .delete-data-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Admin-only styles - FIXED */
+        .admin-only {
+            display: none !important;
+        }
+        
+        .admin-only.show {
+            display: flex !important;
+        }
+        
+        /* Fix for tab content */
+        .admin-tab-content {
+            display: none;
+        }
+        
+        .admin-tab-content.show {
+            display: block;
+        }
+        
+        /* Separate Copy Styles */
+        .separate-copy-section {
+            margin: 15px 0;
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.02);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .copy-title {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .copy-item {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+            position: relative;
+            transition: var(--transition);
+        }
+        
+        .copy-item:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+        
+        .copy-content {
+            padding-right: 40px;
+            word-break: break-word;
+            line-height: 1.6;
+        }
+        
+        .copy-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--secondary-color);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+        }
+        
+        .copy-icon:hover {
+            background-color: var(--primary-color);
+            transform: scale(1.1);
+        }
+        
+        .copy-icon i {
+            font-size: 0.9rem;
+        }
+        
+        .message-type {
+            font-size: 0.8rem;
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .location-name-item {
+            border-left: 3px solid var(--secondary-color);
+        }
+        
+        .remarks-item {
+            border-left: 3px solid var(--warning-color);
+        }
+        
+        .english-message-item {
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .dhivehi-message-item {
+            border-left: 3px solid #8e44ad;
+        }
+        
+        .empty-message {
+            color: var(--text-light);
+            font-style: italic;
+            padding: 8px;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.02);
+            border-radius: 4px;
+        }
+        
         @media (max-width: 992px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -659,22 +1016,29 @@
                 justify-content: center;
             }
             
-            .header-left h1 {
-                font-size: 1.5rem;
+            .admin-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .users-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .data-actions {
+                position: static;
+                justify-content: flex-start;
+                margin-top: 10px;
+            }
+            
+            .log-actions {
+                flex-wrap: wrap;
             }
         }
         
         @media (max-width: 768px) {
-            .main-content {
-                padding: 15px;
-            }
-            
-            .log-header {
-                flex-direction: column;
-            }
-            
-            .timestamp {
-                margin-top: 5px;
+            .login-card {
+                padding: 30px 20px;
             }
             
             .filter-group {
@@ -685,44 +1049,21 @@
                 flex-wrap: wrap;
             }
             
-            .dhivehi-text, .dhivehi-input {
-                font-size: 1rem;
-            }
-            
-            .header-right {
-                flex-wrap: wrap;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .header-right {
+            .admin-controls {
                 flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
             }
             
-            .dark-mode-toggle {
-                padding: 6px 12px;
-                font-size: 0.9rem;
-            }
-            
-            .action-btn {
-                padding: 6px 10px;
-                font-size: 0.8rem;
-            }
-            
-            .tab-content {
-                padding: 15px;
-            }
-            
-            .main-header {
+            .modal-actions {
                 flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
+            }
+            
+            .modal-actions .btn {
+                width: 100%;
             }
         }
     </style>
-    <!-- Dhivehi Faruma Font -->
+    
+    <!-- Dhivehi Font -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic&display=swap" rel="stylesheet">
     <style>
         @font-face {
@@ -732,110 +1073,135 @@
             font-weight: normal;
             font-style: normal;
         }
-        
-        /* Fallback for Faruma font */
-        .dhivehi-text, .dhivehi-input {
-            font-family: 'Faruma', 'Noto Sans Arabic', 'MV Typewriter', 'Mv Waheed', 'Mv Iyyu Nala', sans-serif;
-        }
     </style>
 </head>
 <body>
-    <!-- Sidebar Overlay for Mobile -->
-    <div class="sidebar-overlay" id="sidebar-overlay"></div>
-    
-    <!-- Sidebar Navigation -->
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <h2>Island Log System</h2>
-            <p>Faafu Atoll</p>
-        </div>
-        
-        <div class="nav-menu">
-            <a href="#" class="nav-item active" data-tab="task-log">
-                <i class="fas fa-tasks"></i>
-                <span>Task Log</span>
-            </a>
-            <a href="#" class="nav-item" data-tab="operation-log">
-                <i class="fas fa-search"></i>
-                <span>Operation Log</span>
-            </a>
-            <a href="#" class="nav-item" data-tab="location-log">
-                <i class="fas fa-map-marker-alt"></i>
-                <span>Location Log</span>
-            </a>
-            <a href="#" class="nav-item" id="dark-mode-toggle-sidebar">
+    <!-- Login Screen -->
+    <div class="login-container" id="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo">
+                    <i class="fas fa-island-tropical"></i>
+                </div>
+                <h1>F. Atoll Island Log System</h1>
+                <p>Official Login - Restricted Access</p>
+            </div>
+            
+            <div class="live-time" id="login-time">
+                Loading time...
+            </div>
+            
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter your username">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="password-input">
+                    <input type="password" id="password" placeholder="Enter your password">
+                    <button type="button" class="toggle-password" id="toggle-password">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <button class="btn btn-full" id="login-btn">
+                <i class="fas fa-sign-in-alt"></i> Sign In
+            </button>
+            
+            <div class="dark-mode-toggle" id="login-dark-mode-toggle">
                 <i class="fas fa-moon"></i>
                 <span>Dark Mode</span>
-            </a>
-        </div>
-        
-        <div class="sidebar-footer">
-            <div class="developer">Developer: Ahmed Vaseem</div>
-            <p>Faafu Atoll Police</p>
-            <p>Version 2.0</p>
+            </div>
+            
+            <div class="login-footer">
+                <p>Faafu Atoll Police Department</p>
+                <p class="developer">System Version 7.0 | Developed by Ahmed Vaseem</p>
+                <p style="margin-top: 10px; font-size: 0.8rem; color: var(--warning-color);">
+                    <i class="fas fa-exclamation-circle"></i> For authorized personnel only
+                </p>
+            </div>
         </div>
     </div>
     
-    <!-- Main Content -->
-    <div class="main-content">
-        <!-- Header -->
-        <div class="main-header">
-            <div class="header-left">
-                <h1>F. Atoll Island Task, Operation & Location Log System</h1>
-                <p>Track and manage all island activities in one place</p>
+    <!-- Dashboard (Initially Hidden) -->
+    <div class="dashboard" id="dashboard">
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>Island Log System</h2>
+                <p>Faafu Atoll</p>
             </div>
             
-            <div class="header-right">
-                <div class="dark-mode-toggle" id="dark-mode-toggle">
+            <div class="user-info">
+                <div class="user-avatar" id="user-avatar">AV</div>
+                <div class="user-details">
+                    <div class="user-name" id="sidebar-username">Loading...</div>
+                    <div class="user-role" id="sidebar-role">Administrator</div>
+                </div>
+            </div>
+            
+            <div class="nav-menu">
+                <a href="#" class="nav-item active" data-tab="task-log">
+                    <i class="fas fa-tasks"></i>
+                    <span>Task Log</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="operation-log">
+                    <i class="fas fa-search"></i>
+                    <span>Operation Log</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="location-log">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Location Log</span>
+                </a>
+                <a href="#" class="nav-item admin-only" data-tab="admin-panel" id="admin-tab">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Admin Panel</span>
+                </a>
+                <a href="#" class="nav-item" id="dashboard-dark-mode-toggle">
                     <i class="fas fa-moon"></i>
                     <span>Dark Mode</span>
+                </a>
+            </div>
+            
+            <div class="sidebar-footer">
+                <p>Logged in as: <span id="footer-username">Loading...</span></p>
+                <p id="sidebar-time">Loading time...</p>
+                <button class="logout-btn" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="main-header">
+                <div class="header-left">
+                    <h1>F. Atoll Island Task, Operation & Location Log</h1>
+                    <p>Welcome, <span id="header-username">Loading...</span> | <span id="dashboard-time">Loading time...</span></p>
                 </div>
                 
-                <div class="hamburger-menu" id="hamburger-menu">
-                    <i class="fas fa-bars"></i>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Tab Contents -->
-        <div id="task-log" class="tab-content active">
-            <div class="form-group">
-                <label for="task-island-select">Select Island</label>
-                <select id="task-island-select">
-                    <option value="">-- Select an island --</option>
-                    <option value="F.Feeali">F.Feeali</option>
-                    <option value="F.Bilehdhoo">F.Bilehdhoo</option>
-                    <option value="F.Dharaboodhoo">F.Dharaboodhoo</option>
-                    <option value="F.Magoodhoo">F.Magoodhoo</option>
-                    <option value="F.Nilandhoo">F.Nilandhoo</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="task-service-number">Officer Service Number</label>
-                <input type="text" id="task-service-number" placeholder="Enter officer service number">
-            </div>
-            
-            <div class="form-group">
-                <label>Task Message</label>
-                <div class="language-tabs">
-                    <button type="button" class="language-tab active" data-lang="en">English</button>
-                    <button type="button" class="language-tab" data-lang="dv">Dhivehi</button>
-                </div>
-                <div id="task-message-en" class="message-container active">
-                    <textarea id="task-message-en-input" placeholder="Enter task message in English..."></textarea>
-                </div>
-                <div id="task-message-dv" class="message-container">
-                    <textarea id="task-message-dv-input" class="dhivehi-input" placeholder="ޓާސްކް މެސެޖެއް ލިޔޭ..."></textarea>
+                <div class="header-right">
+                    <div class="hamburger-menu" id="hamburger-menu">
+                        <i class="fas fa-bars"></i>
+                    </div>
                 </div>
             </div>
             
-            <button id="save-task" class="btn">Save Task</button>
-            
-            <div class="filter-section">
-                <div class="filter-group">
-                    <select id="task-filter-island" class="filter-select">
-                        <option value="">All Islands</option>
+            <!-- Tab Contents -->
+            <div id="task-log" class="tab-content active">
+                <h2>Task Log Management</h2>
+                <p>Record and manage daily tasks for each island</p>
+                
+                <div class="form-group">
+                    <label for="task-island-select">Select Island</label>
+                    <select id="task-island-select">
+                        <option value="">-- Select an island --</option>
                         <option value="F.Feeali">F.Feeali</option>
                         <option value="F.Bilehdhoo">F.Bilehdhoo</option>
                         <option value="F.Dharaboodhoo">F.Dharaboodhoo</option>
@@ -843,190 +1209,317 @@
                         <option value="F.Nilandhoo">F.Nilandhoo</option>
                     </select>
                 </div>
-                <div class="stats">
-                    <span id="task-total-count">Total Tasks: 0</span>
-                    <span id="task-filtered-count">Filtered: 0</span>
-                </div>
-            </div>
-            
-            <div class="log-container" id="task-log-container">
-                <div class="loading">Loading task logs...</div>
-            </div>
-        </div>
-        
-        <div id="operation-log" class="tab-content">
-            <div class="form-group">
-                <label for="operation-island-select">Select Island</label>
-                <select id="operation-island-select">
-                    <option value="">-- Select an island --</option>
-                    <option value="F.Feeali">F.Feeali</option>
-                    <option value="F.Bilehdhoo">F.Bilehdhoo</option>
-                    <option value="F.Dharaboodhoo">F.Dharaboodhoo</option>
-                    <option value="F.Magoodhoo">F.Magoodhoo</option>
-                    <option value="F.Nilandhoo">F.Nilandhoo</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="operation-service-number">Officer Service Number</label>
-                <input type="text" id="operation-service-number" placeholder="Enter officer service number">
-            </div>
-            
-            <div class="form-group">
-                <label>Operation Message</label>
-                <div class="language-tabs">
-                    <button type="button" class="language-tab active" data-lang="en">English</button>
-                    <button type="button" class="language-tab" data-lang="dv">Dhivehi</button>
-                </div>
-                <div id="operation-message-en" class="message-container active">
-                    <textarea id="operation-message-en-input" placeholder="Enter operation message in English..."></textarea>
-                </div>
-                <div id="operation-message-dv" class="message-container">
-                    <textarea id="operation-message-dv-input" class="dhivehi-input" placeholder="އޮޕަރޭޝަން މެސެޖެއް ލިޔޭ..."></textarea>
-                </div>
-            </div>
-            
-            <button id="save-operation" class="btn">Save Operation</button>
-            
-            <div class="filter-section">
-                <div class="filter-group">
-                    <select id="operation-filter-island" class="filter-select">
-                        <option value="">All Islands</option>
-                        <option value="F.Feeali">F.Feeali</option>
-                        <option value="F.Bilehdhoo">F.Bilehdhoo</option>
-                        <option value="F.Dharaboodhoo">F.Dharaboodhoo</option>
-                        <option value="F.Magoodhoo">F.Magoodhoo</option>
-                        <option value="F.Nilandhoo">F.Nilandhoo</option>
-                    </select>
-                </div>
-                <div class="stats">
-                    <span id="operation-total-count">Total Operations: 0</span>
-                    <span id="operation-filtered-count">Filtered: 0</span>
-                </div>
-            </div>
-            
-            <div class="log-container" id="operation-log-container">
-                <div class="loading">Loading operation logs...</div>
-            </div>
-        </div>
-        
-        <div id="location-log" class="tab-content">
-            <div class="form-group">
-                <label for="location-island-select">Select Island</label>
-                <select id="location-island-select">
-                    <option value="">-- Select an island --</option>
-                    <option value="F.Feeali">F.Feeali</option>
-                    <option value="F.Bilehdhoo">F.Bilehdhoo</option>
-                    <option value="F.Dharaboodhoo">F.Dharaboodhoo</option>
-                    <option value="F.Magoodhoo">F.Magoodhoo</option>
-                    <option value="F.Nilandhoo">F.Nilandhoo</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="location-name">Location Name</label>
-                <input type="text" id="location-name" placeholder="Enter location name (e.g., Police Station, Harbor, Health Center)">
-            </div>
-            
-            <div class="form-group">
-                <label for="location-remarks">Remarks Message</label>
-                <textarea id="location-remarks" placeholder="Enter remarks about this location..."></textarea>
-            </div>
-            
-            <button id="save-location" class="btn">Save Location</button>
-            
-            <div class="filter-section">
-                <div class="filter-group">
-                    <select id="location-filter-island" class="filter-select">
-                        <option value="">All Islands</option>
-                        <option value="F.Feeali">F.Feeali</option>
-                        <option value="F.Bilehdhoo">F.Bilehdhoo</option>
-                        <option value="F.Dharaboodhoo">F.Dharaboodhoo</option>
-                        <option value="F.Magoodhoo">F.Magoodhoo</option>
-                        <option value="F.Nilandhoo">F.Nilandhoo</option>
-                    </select>
-                </div>
-                <div class="stats">
-                    <span id="location-total-count">Total Locations: 0</span>
-                    <span id="location-filtered-count">Filtered: 0</span>
-                </div>
-            </div>
-            
-            <div class="log-container" id="location-log-container">
-                <div class="loading">Loading location logs...</div>
-            </div>
-        </div>
-        
-        <!-- Footer -->
-        <footer class="main-footer">
-            <p>Faafu Atoll Island Log System &copy; <span id="current-year"></span></p>
-            <p class="developer">Developed by: Ahmed Vaseem</p>
-            <p>For official use only</p>
-        </footer>
-    </div>
-    
-    <!-- Edit Modal -->
-    <div id="edit-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="edit-modal-title">Edit Log Entry</h2>
-                <button class="close-btn">&times;</button>
-            </div>
-            <div id="edit-location-fields">
-                <!-- Location edit fields will be shown here -->
+                
                 <div class="form-group">
-                    <label for="edit-island">Island</label>
-                    <select id="edit-island">
-                        <option value="F.Feeali">F.Feeali</option>
-                        <option value="F.Bilehdhoo">F.Bilehdhoo</option>
-                        <option value="F.Dharaboodhoo">F.Dharaboodhoo</option>
-                        <option value="F.Magoodhoo">F.Magoodhoo</option>
-                        <option value="F.Nilandhoo">F.Nilandhoo</option>
-                    </select>
+                    <label for="task-service-number">Officer Service Number</label>
+                    <input type="text" id="task-service-number" placeholder="Enter officer service number">
                 </div>
+                
                 <div class="form-group">
-                    <label for="edit-location-name">Location Name</label>
-                    <input type="text" id="edit-location-name" placeholder="Enter location name">
-                </div>
-                <div class="form-group">
-                    <label for="edit-location-remarks">Remarks</label>
-                    <textarea id="edit-location-remarks"></textarea>
-                </div>
-            </div>
-            <div id="edit-task-fields">
-                <!-- Task edit fields will be shown here -->
-                <div class="form-group">
-                    <label for="edit-island-task">Island</label>
-                    <select id="edit-island-task">
-                        <option value="F.Feeali">F.Feeali</option>
-                        <option value="F.Bilehdhoo">F.Bilehdhoo</option>
-                        <option value="F.Dharaboodhoo">F.Dharaboodhoo</option>
-                        <option value="F.Magoodhoo">F.Magoodhoo</option>
-                        <option value="F.Nilandhoo">F.Nilandhoo</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="edit-service-number-task">Officer Service Number</label>
-                    <input type="text" id="edit-service-number-task" placeholder="Enter officer service number">
-                </div>
-                <div class="form-group">
-                    <label>Message</label>
+                    <label>Task Message</label>
                     <div class="language-tabs">
                         <button type="button" class="language-tab active" data-lang="en">English</button>
                         <button type="button" class="language-tab" data-lang="dv">Dhivehi</button>
                     </div>
-                    <div id="edit-message-en" class="message-container active">
-                        <textarea id="edit-message-en-input"></textarea>
+                    <div id="task-message-en" class="message-container active">
+                        <textarea id="task-message-en-input" placeholder="Enter task message in English..."></textarea>
                     </div>
-                    <div id="edit-message-dv" class="message-container">
-                        <textarea id="edit-message-dv-input" class="dhivehi-input"></textarea>
+                    <div id="task-message-dv" class="message-container">
+                        <textarea id="task-message-dv-input" class="dhivehi-input" placeholder="ޓާސްކް މެސެޖެއް ލިޔޭ..."></textarea>
                     </div>
                 </div>
+                
+                <button id="save-task" class="btn btn-full">
+                    <i class="fas fa-save"></i> Save Task
+                </button>
+                
+                <div class="filter-section">
+                    <div class="filter-group">
+                        <select id="task-filter-island" class="filter-select">
+                            <option value="">All Islands</option>
+                            <option value="F.Feeali">F.Feeali</option>
+                            <option value="F.Bilehdhoo">F.Bilehdhoo</option>
+                            <option value="F.Dharaboodhoo">F.Dharaboodhoo</option>
+                            <option value="F.Magoodhoo">F.Magoodhoo</option>
+                            <option value="F.Nilandhoo">F.Nilandhoo</option>
+                        </select>
+                    </div>
+                    <div class="stats">
+                        <span id="task-total-count">Total Tasks: 0</span>
+                        <span id="task-filtered-count">Filtered: 0</span>
+                    </div>
+                </div>
+                
+                <div class="log-container" id="task-log-container">
+                    <div class="loading">Loading task logs...</div>
+                </div>
             </div>
-            <button id="update-log" class="btn">Update Log</button>
+            
+            <div id="operation-log" class="tab-content">
+                <h2>Operation Log Management</h2>
+                <p>Record and track operational activities</p>
+                
+                <div class="form-group">
+                    <label for="operation-island-select">Select Island</label>
+                    <select id="operation-island-select">
+                        <option value="">-- Select an island --</option>
+                        <option value="F.Feeali">F.Feeali</option>
+                        <option value="F.Bilehdhoo">F.Bilehdhoo</option>
+                        <option value="F.Dharaboodhoo">F.Dharaboodhoo</option>
+                        <option value="F.Magoodhoo">F.Magoodhoo</option>
+                        <option value="F.Nilandhoo">F.Nilandhoo</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="operation-service-number">Officer Service Number</label>
+                    <input type="text" id="operation-service-number" placeholder="Enter officer service number">
+                </div>
+                
+                <div class="form-group">
+                    <label>Operation Message</label>
+                    <div class="language-tabs">
+                        <button type="button" class="language-tab active" data-lang="en">English</button>
+                        <button type="button" class="language-tab" data-lang="dv">Dhivehi</button>
+                    </div>
+                    <div id="operation-message-en" class="message-container active">
+                        <textarea id="operation-message-en-input" placeholder="Enter operation message in English..."></textarea>
+                    </div>
+                    <div id="operation-message-dv" class="message-container">
+                        <textarea id="operation-message-dv-input" class="dhivehi-input" placeholder="އޮޕަރޭޝަން މެސެޖެއް ލިޔޭ..."></textarea>
+                    </div>
+                </div>
+                
+                <button id="save-operation" class="btn btn-full">
+                    <i class="fas fa-save"></i> Save Operation
+                </button>
+                
+                <div class="filter-section">
+                    <div class="filter-group">
+                        <select id="operation-filter-island" class="filter-select">
+                            <option value="">All Islands</option>
+                            <option value="F.Feeali">F.Feeali</option>
+                            <option value="F.Bilehdhoo">F.Bilehdhoo</option>
+                            <option value="F.Dharaboodhoo">F.Dharaboodhoo</option>
+                            <option value="F.Magoodhoo">F.Magoodhoo</option>
+                            <option value="F.Nilandhoo">F.Nilandhoo</option>
+                        </select>
+                    </div>
+                    <div class="stats">
+                        <span id="operation-total-count">Total Operations: 0</span>
+                        <span id="operation-filtered-count">Filtered: 0</span>
+                    </div>
+                </div>
+                
+                <div class="log-container" id="operation-log-container">
+                    <div class="loading">Loading operation logs...</div>
+                </div>
+            </div>
+            
+            <div id="location-log" class="tab-content">
+                <h2>Location Log Management</h2>
+                <p>Track and manage island locations</p>
+                
+                <div class="form-group">
+                    <label for="location-island-select">Select Island</label>
+                    <select id="location-island-select">
+                        <option value="">-- Select an island --</option>
+                        <option value="F.Feeali">F.Feeali</option>
+                        <option value="F.Bilehdhoo">F.Bilehdhoo</option>
+                        <option value="F.Dharaboodhoo">F.Dharaboodhoo</option>
+                        <option value="F.Magoodhoo">F.Magoodhoo</option>
+                        <option value="F.Nilandhoo">F.Nilandhoo</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="location-name">Location Name</label>
+                    <input type="text" id="location-name" placeholder="Enter location name (e.g., Police Station, Harbor, Health Center)">
+                </div>
+                
+                <div class="form-group">
+                    <label for="location-remarks">Remarks Message</label>
+                    <textarea id="location-remarks" placeholder="Enter remarks about this location..."></textarea>
+                </div>
+                
+                <button id="save-location" class="btn btn-full">
+                    <i class="fas fa-save"></i> Save Location
+                </button>
+                
+                <div class="filter-section">
+                    <div class="filter-group">
+                        <select id="location-filter-island" class="filter-select">
+                            <option value="">All Islands</option>
+                            <option value="F.Feeali">F.Feeali</option>
+                            <option value="F.Bilehdhoo">F.Bilehdhoo</option>
+                            <option value="F.Dharaboodhoo">F.Dharaboodhoo</option>
+                            <option value="F.Magoodhoo">F.Magoodhoo</option>
+                            <option value="F.Nilandhoo">F.Nilandhoo</option>
+                        </select>
+                    </div>
+                    <div class="stats">
+                        <span id="location-total-count">Total Locations: 0</span>
+                        <span id="location-filtered-count">Filtered: 0</span>
+                    </div>
+                </div>
+                
+                <div class="log-container" id="location-log-container">
+                    <div class="loading">Loading location logs...</div>
+                </div>
+            </div>
+            
+            <!-- Admin Panel (Only visible to av_5637) -->
+            <div id="admin-panel" class="tab-content admin-tab-content">
+                <h2>Admin Panel - User Management</h2>
+                <p>Manage user access and monitor system activity</p>
+                
+                <div class="admin-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-value" id="total-users">0</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div class="stat-value" id="active-users">0</div>
+                        <div class="stat-label">Active Users</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-slash"></i>
+                        </div>
+                        <div class="stat-value" id="inactive-users">0</div>
+                        <div class="stat-label">Inactive Users</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <div class="stat-value" id="today-logins">0</div>
+                        <div class="stat-label">Today's Logins</div>
+                    </div>
+                </div>
+                
+                <div class="admin-controls">
+                    <button class="btn btn-secondary" id="add-user-btn">
+                        <i class="fas fa-user-plus"></i> Add New User
+                    </button>
+                    <button class="btn btn-warning" id="refresh-users-btn">
+                        <i class="fas fa-sync-alt"></i> Refresh List
+                    </button>
+                </div>
+                
+                <h3>User Management</h3>
+                <p class="admin-note" style="color: var(--warning-color); margin-bottom: 15px; font-size: 0.9rem;">
+                    <i class="fas fa-exclamation-triangle"></i> Only av_5637 can access and manage users
+                </p>
+                
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Full Name</th>
+                            <th>Role</th>
+                            <th>Last Login</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table-body">
+                        <tr>
+                            <td colspan="6" style="text-align: center;">Loading users...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Footer -->
+            <footer class="main-footer">
+                <p>Faafu Atoll Island Log System &copy; <span id="current-year"></span></p>
+                <p class="developer">Developed by: Ahmed Vaseem</p>
+                <p>For official use only | Version 7.0</p>
+            </footer>
         </div>
     </div>
-
+    
+    <!-- Add User Modal -->
+    <div id="add-user-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New User</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="new-username">Username</label>
+                <input type="text" id="new-username" placeholder="Enter username">
+            </div>
+            <div class="form-group">
+                <label for="new-password">Password</label>
+                <input type="password" id="new-password" placeholder="Enter password">
+            </div>
+            <div class="form-group">
+                <label for="new-fullname">Full Name</label>
+                <input type="text" id="new-fullname" placeholder="Enter full name">
+            </div>
+            <div class="form-group">
+                <label for="new-role">Role</label>
+                <select id="new-role">
+                    <option value="admin">Administrator</option>
+                    <option value="user" selected>Regular User</option>
+                    <option value="viewer">Viewer (Read Only)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="new-user-active" checked> Active Account
+                </label>
+            </div>
+            <div class="modal-actions">
+                <button id="save-new-user" class="btn btn-secondary">Save User</button>
+                <button class="btn close-modal-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Data Modal -->
+    <div id="edit-data-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="edit-modal-title">Edit Data</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div id="edit-modal-content">
+                <!-- Dynamic content will be loaded here -->
+            </div>
+            <div class="modal-actions">
+                <button id="save-edit" class="btn btn-secondary">Save Changes</button>
+                <button class="btn close-modal-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Confirm Delete</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <p id="delete-message">Are you sure you want to delete this item?</p>
+            <div class="modal-actions">
+                <button id="confirm-delete" class="btn btn-danger">Delete</button>
+                <button class="btn close-modal-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Toast Notification -->
     <div id="toast" class="toast"></div>
 
@@ -1043,17 +1536,67 @@
             measurementId: "G-VH5GX7C6QC"
         };
 
+        // Initialize Firebase
+        let app, database, auth;
+        try {
+            app = firebase.initializeApp(firebaseConfig);
+            database = firebase.database();
+            auth = firebase.auth();
+            console.log("Firebase initialized successfully");
+        } catch (error) {
+            console.error("Firebase initialization error:", error);
+        }
+
         // DOM Elements
+        const loginContainer = document.getElementById('login-container');
+        const dashboard = document.getElementById('dashboard');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('login-btn');
+        const togglePasswordBtn = document.getElementById('toggle-password');
+        const loginTimeElement = document.getElementById('login-time');
+        const loginDarkModeToggle = document.getElementById('login-dark-mode-toggle');
+        
+        // Dashboard elements
         const sidebar = document.getElementById('sidebar');
         const navItems = document.querySelectorAll('.nav-item');
         const tabContents = document.querySelectorAll('.tab-content');
         const hamburgerMenu = document.getElementById('hamburger-menu');
         const sidebarOverlay = document.getElementById('sidebar-overlay');
-        const darkModeToggle = document.getElementById('dark-mode-toggle');
-        const darkModeToggleSidebar = document.getElementById('dark-mode-toggle-sidebar');
+        const dashboardDarkModeToggle = document.getElementById('dashboard-dark-mode-toggle');
         const currentYearSpan = document.getElementById('current-year');
+        const logoutBtn = document.getElementById('logout-btn');
         
-        // Task elements
+        // User info elements
+        const userAvatar = document.getElementById('user-avatar');
+        const sidebarUsername = document.getElementById('sidebar-username');
+        const sidebarRole = document.getElementById('sidebar-role');
+        const footerUsername = document.getElementById('footer-username');
+        const headerUsername = document.getElementById('header-username');
+        const sidebarTimeElement = document.getElementById('sidebar-time');
+        const dashboardTimeElement = document.getElementById('dashboard-time');
+        
+        // Admin panel elements
+        const adminTab = document.getElementById('admin-tab');
+        const totalUsersElement = document.getElementById('total-users');
+        const activeUsersElement = document.getElementById('active-users');
+        const inactiveUsersElement = document.getElementById('inactive-users');
+        const todayLoginsElement = document.getElementById('today-logins');
+        const addUserBtn = document.getElementById('add-user-btn');
+        const refreshUsersBtn = document.getElementById('refresh-users-btn');
+        const usersTableBody = document.getElementById('users-table-body');
+        const addUserModal = document.getElementById('add-user-modal');
+        const editDataModal = document.getElementById('edit-data-modal');
+        const deleteModal = document.getElementById('delete-modal');
+        const closeModalBtns = document.querySelectorAll('.close-btn, .close-modal-btn');
+        const saveNewUserBtn = document.getElementById('save-new-user');
+        const saveEditBtn = document.getElementById('save-edit');
+        const confirmDeleteBtn = document.getElementById('confirm-delete');
+        const editModalContent = document.getElementById('edit-modal-content');
+        const editModalTitle = document.getElementById('edit-modal-title');
+        const deleteMessage = document.getElementById('delete-message');
+        
+        // Logging elements
         const taskIslandSelect = document.getElementById('task-island-select');
         const taskServiceNumber = document.getElementById('task-service-number');
         const taskMessageEnInput = document.getElementById('task-message-en-input');
@@ -1064,7 +1607,6 @@
         const taskFilteredCount = document.getElementById('task-filtered-count');
         const taskLogContainer = document.getElementById('task-log-container');
         
-        // Operation elements
         const operationIslandSelect = document.getElementById('operation-island-select');
         const operationServiceNumber = document.getElementById('operation-service-number');
         const operationMessageEnInput = document.getElementById('operation-message-en-input');
@@ -1075,7 +1617,6 @@
         const operationFilteredCount = document.getElementById('operation-filtered-count');
         const operationLogContainer = document.getElementById('operation-log-container');
         
-        // Location elements
         const locationIslandSelect = document.getElementById('location-island-select');
         const locationNameInput = document.getElementById('location-name');
         const locationRemarksInput = document.getElementById('location-remarks');
@@ -1085,206 +1626,60 @@
         const locationFilteredCount = document.getElementById('location-filtered-count');
         const locationLogContainer = document.getElementById('location-log-container');
         
-        // Modal elements
-        const editModal = document.getElementById('edit-modal');
-        const closeModalBtn = document.querySelector('.close-btn');
-        const editModalTitle = document.getElementById('edit-modal-title');
-        const editLocationFields = document.getElementById('edit-location-fields');
-        const editTaskFields = document.getElementById('edit-task-fields');
-        const editIsland = document.getElementById('edit-island');
-        const editLocationName = document.getElementById('edit-location-name');
-        const editLocationRemarks = document.getElementById('edit-location-remarks');
-        const editIslandTask = document.getElementById('edit-island-task');
-        const editServiceNumberTask = document.getElementById('edit-service-number-task');
-        const editMessageEnInput = document.getElementById('edit-message-en-input');
-        const editMessageDvInput = document.getElementById('edit-message-dv-input');
-        const updateLogBtn = document.getElementById('update-log');
         const toast = document.getElementById('toast');
         
-        // Language tabs
-        const languageTabs = document.querySelectorAll('.language-tab');
-        
-        // Firebase variables
-        let database;
-        let taskLogsRef;
-        let operationLogsRef;
-        let locationLogsRef;
-        
         // Data storage
+        let currentUser = null;
+        let users = [];
         let taskLogs = [];
         let operationLogs = [];
         let locationLogs = [];
-        let currentEditId = null;
-        let currentEditType = null;
         let isMobile = false;
-
-        // Check if mobile
-        function checkMobile() {
-            isMobile = window.innerWidth <= 992;
-            if (isMobile) {
-                sidebar.classList.add('collapsed');
-            } else {
-                sidebar.classList.remove('collapsed');
-                sidebarOverlay.classList.remove('active');
-            }
-        }
-
-        // Toggle sidebar
-        function toggleSidebar() {
-            if (isMobile) {
-                sidebar.classList.toggle('active');
-                sidebarOverlay.classList.toggle('active');
-            } else {
-                sidebar.classList.toggle('collapsed');
-            }
-        }
-
-        // Close sidebar on mobile
-        function closeSidebarMobile() {
-            if (isMobile) {
-                sidebar.classList.remove('active');
-                sidebarOverlay.classList.remove('active');
-            }
-        }
-
-        // Initialize Firebase - COMPATIBLE VERSION
-        function initializeFirebase() {
-            console.log("Initializing Firebase...");
-            
-            try {
-                // Initialize Firebase
-                firebase.initializeApp(firebaseConfig);
-                console.log("Firebase initialized successfully");
-                
-                // Get database reference
-                database = firebase.database();
-                
-                // Set up references
-                taskLogsRef = database.ref('taskLogs');
-                operationLogsRef = database.ref('operationLogs');
-                locationLogsRef = database.ref('locationLogs');
-                
-                // Load data from Firebase
-                loadTaskLogs();
-                loadOperationLogs();
-                loadLocationLogs();
-                
-                console.log("Firebase setup complete");
-                return true;
-                
-            } catch (error) {
-                console.error("Firebase initialization error:", error);
-                alert("Firebase connection failed. Please check console for details.");
-                return false;
-            }
-        }
+        let timeInterval;
         
-        // Load task logs from Firebase
-        function loadTaskLogs() {
-            taskLogsRef.on('value', (snapshot) => {
-                const data = snapshot.val();
-                console.log("Task logs received from Firebase:", data);
-                
-                taskLogs = data ? Object.entries(data).map(([key, value]) => ({
-                    id: key,
-                    ...value
-                })) : [];
-                
-                // Sort by timestamp (newest first)
-                taskLogs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                
-                renderTaskLogs();
-            }, (error) => {
-                console.error("Error loading task logs:", error);
-                taskLogContainer.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <p>Error loading task logs. Please refresh the page.</p>
-                    </div>
-                `;
-            });
-        }
+        // Current item to edit/delete
+        let currentEditItem = null;
+        let currentDeleteItem = null;
+        let currentDataType = null; // 'task', 'operation', 'location', 'user'
         
-        // Load operation logs from Firebase
-        function loadOperationLogs() {
-            operationLogsRef.on('value', (snapshot) => {
-                const data = snapshot.val();
-                console.log("Operation logs received from Firebase:", data);
-                
-                operationLogs = data ? Object.entries(data).map(([key, value]) => ({
-                    id: key,
-                    ...value
-                })) : [];
-                
-                // Sort by timestamp (newest first)
-                operationLogs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                
-                renderOperationLogs();
-            }, (error) => {
-                console.error("Error loading operation logs:", error);
-                operationLogContainer.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <p>Error loading operation logs. Please refresh the page.</p>
-                    </div>
-                `;
-            });
-        }
-        
-        // Load location logs from Firebase
-        function loadLocationLogs() {
-            locationLogsRef.on('value', (snapshot) => {
-                const data = snapshot.val();
-                console.log("Location logs received from Firebase:", data);
-                
-                locationLogs = data ? Object.entries(data).map(([key, value]) => ({
-                    id: key,
-                    ...value
-                })) : [];
-                
-                // Sort by timestamp (newest first)
-                locationLogs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                
-                renderLocationLogs();
-            }, (error) => {
-                console.error("Error loading location logs:", error);
-                locationLogContainer.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <p>Error loading location logs. Please refresh the page.</p>
-                    </div>
-                `;
-            });
-        }
-        
-        // Initialize the app
+        // Check if current user is admin (av_5637)
+        let isAdmin = false;
+
+        // Initialize the application
         function init() {
             console.log("Initializing application...");
             
-            // Set current year in footer
+            // Set current year
             currentYearSpan.textContent = new Date().getFullYear();
             
-            // Check mobile on load and resize
-            checkMobile();
-            window.addEventListener('resize', checkMobile);
+            // Update time every second
+            updateTime();
+            timeInterval = setInterval(updateTime, 1000);
             
-            // Initialize Firebase
-            initializeFirebase();
+            // Check for saved dark mode preference
+            if (localStorage.getItem('darkMode') === 'enabled') {
+                document.body.classList.add('dark-mode');
+                updateDarkModeToggle(true);
+            }
             
-            // Hamburger menu toggle
+            // Event Listeners
+            togglePasswordBtn.addEventListener('click', togglePasswordVisibility);
+            loginBtn.addEventListener('click', handleLogin);
+            loginDarkModeToggle.addEventListener('click', toggleDarkMode);
+            dashboardDarkModeToggle.addEventListener('click', toggleDarkMode);
+            logoutBtn.addEventListener('click', handleLogout);
+            
+            // Dashboard navigation
             hamburgerMenu.addEventListener('click', toggleSidebar);
-            
-            // Sidebar overlay click to close
             sidebarOverlay.addEventListener('click', closeSidebarMobile);
             
-            // Navigation switching
             navItems.forEach(item => {
                 item.addEventListener('click', function(e) {
                     e.preventDefault();
                     const tabId = this.getAttribute('data-tab');
                     
                     // Handle dark mode toggle separately
-                    if (this.id === 'dark-mode-toggle-sidebar') {
+                    if (this.id === 'dashboard-dark-mode-toggle') {
                         toggleDarkMode();
                         return;
                     }
@@ -1293,68 +1688,253 @@
                     this.classList.add('active');
                     
                     tabContents.forEach(tc => tc.classList.remove('active'));
-                    document.getElementById(tabId).classList.add('active');
                     
-                    // Close sidebar on mobile after selection
+                    // Handle admin panel separately
+                    if (tabId === 'admin-panel') {
+                        if (!isAdmin) {
+                            showToast('Admin access required');
+                            // Switch to task log instead
+                            document.querySelector('.nav-item[data-tab="task-log"]').click();
+                            return;
+                        }
+                        document.getElementById(tabId).classList.add('active');
+                    } else {
+                        document.getElementById(tabId).classList.add('active');
+                    }
+                    
                     closeSidebarMobile();
                 });
             });
             
-            // Dark mode toggle
-            darkModeToggle.addEventListener('click', toggleDarkMode);
-            darkModeToggleSidebar.addEventListener('click', toggleDarkMode);
+            // Admin panel events (only for admin)
+            addUserBtn.addEventListener('click', () => {
+                if (!isAdmin) {
+                    showToast('Admin access required');
+                    return;
+                }
+                showModal(addUserModal);
+            });
+            refreshUsersBtn.addEventListener('click', loadUsers);
             
-            // Language tab switching
-            languageTabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    const container = this.closest('.form-group');
-                    const lang = this.getAttribute('data-lang');
-                    
-                    // Update active tab
-                    container.querySelectorAll('.language-tab').forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // Update active message container
-                    container.querySelectorAll('.message-container').forEach(mc => mc.classList.remove('active'));
-                    container.querySelector(`.message-container[id$="-${lang}"]`).classList.add('active');
+            // Modal events
+            closeModalBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const modal = this.closest('.modal');
+                    if (modal) hideModal(modal);
                 });
             });
             
-            // Save task
-            saveTaskBtn.addEventListener('click', saveTask);
-            
-            // Save operation
-            saveOperationBtn.addEventListener('click', saveOperation);
-            
-            // Save location
-            saveLocationBtn.addEventListener('click', saveLocation);
-            
-            // Filter events
-            taskFilterIsland.addEventListener('change', renderTaskLogs);
-            operationFilterIsland.addEventListener('change', renderOperationLogs);
-            locationFilterIsland.addEventListener('change', renderLocationLogs);
-            
-            // Modal events
-            closeModalBtn.addEventListener('click', () => {
-                editModal.style.display = 'none';
-            });
-            
-            updateLogBtn.addEventListener('click', updateLog);
+            saveNewUserBtn.addEventListener('click', saveNewUser);
+            saveEditBtn.addEventListener('click', saveEdit);
+            confirmDeleteBtn.addEventListener('click', confirmDelete);
             
             // Close modal when clicking outside
             window.addEventListener('click', (e) => {
-                if (e.target === editModal) {
-                    editModal.style.display = 'none';
+                if (e.target.classList.contains('modal')) {
+                    hideModal(e.target);
                 }
             });
             
-            // Check for saved dark mode preference
-            if (localStorage.getItem('darkMode') === 'enabled') {
-                document.body.classList.add('dark-mode');
-                updateDarkModeToggle(true);
-            }
+            // Check mobile on load and resize
+            checkMobile();
+            window.addEventListener('resize', checkMobile);
+            
+            // Initialize logging functionality
+            initLogging();
+            
+            // Check if user is already logged in
+            checkExistingSession();
             
             console.log("Application initialized");
+        }
+        
+        // Check existing session
+        function checkExistingSession() {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                try {
+                    const user = JSON.parse(savedUser);
+                    // Verify user still exists in database
+                    database.ref('users/' + user.username).once('value')
+                        .then(snapshot => {
+                            if (snapshot.exists()) {
+                                const userData = snapshot.val();
+                                if (userData.isActive) {
+                                    loginUser(user);
+                                } else {
+                                    localStorage.removeItem('currentUser');
+                                    showToast('Your account has been deactivated');
+                                }
+                            } else {
+                                localStorage.removeItem('currentUser');
+                            }
+                        });
+                } catch (e) {
+                    localStorage.removeItem('currentUser');
+                }
+            }
+        }
+        
+        // Update time display
+        function updateTime() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            const timeStr = now.toLocaleTimeString('en-US', {
+                hour12: true,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            
+            const fullTime = `${dateStr} | ${timeStr}`;
+            
+            if (loginTimeElement) loginTimeElement.textContent = fullTime;
+            if (sidebarTimeElement) sidebarTimeElement.textContent = fullTime;
+            if (dashboardTimeElement) dashboardTimeElement.textContent = fullTime;
+        }
+        
+        // Toggle password visibility
+        function togglePasswordVisibility() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            togglePasswordBtn.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+        }
+        
+        // Handle login
+        async function handleLogin() {
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+            
+            if (!username || !password) {
+                showToast('Please enter username and password');
+                return;
+            }
+            
+            // Show loading
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+            loginBtn.disabled = true;
+            
+            try {
+                // Check user in database
+                const userRef = database.ref('users/' + username);
+                const snapshot = await userRef.once('value');
+                
+                if (!snapshot.exists()) {
+                    showToast('User not found');
+                    loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+                    loginBtn.disabled = false;
+                    return;
+                }
+                
+                const userData = snapshot.val();
+                
+                // Check if account is active
+                if (!userData.isActive) {
+                    showToast('Account is deactivated. Contact administrator.');
+                    loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+                    loginBtn.disabled = false;
+                    return;
+                }
+                
+                // Verify password
+                if (userData.password !== password) {
+                    showToast('Invalid password');
+                    loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+                    loginBtn.disabled = false;
+                    return;
+                }
+                
+                // Update last login
+                await userRef.update({
+                    lastLogin: new Date().toISOString()
+                });
+                
+                // Login successful
+                loginUser({
+                    username: username,
+                    fullName: userData.fullName,
+                    role: userData.role
+                });
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                showToast('Login failed. Please try again.');
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+                loginBtn.disabled = false;
+            }
+        }
+        
+        // Login user
+        function loginUser(user) {
+            currentUser = user;
+            // Only av_5637 can access admin panel
+            isAdmin = user.username === 'av_5637';
+            
+            // Save to localStorage
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            
+            // Update UI with user info
+            updateUserInfo(user);
+            
+            // Switch to dashboard
+            loginContainer.style.display = 'none';
+            dashboard.style.display = 'flex';
+            
+            // Load data
+            if (isAdmin) {
+                loadUsers();
+                // Show admin tab
+                adminTab.classList.add('show');
+            } else {
+                // Hide admin tab
+                adminTab.classList.remove('show');
+            }
+            loadTaskLogs();
+            loadOperationLogs();
+            loadLocationLogs();
+            
+            // Show welcome message
+            showToast(`Welcome, ${user.fullName}!`);
+            
+            // Reset login form
+            usernameInput.value = '';
+            passwordInput.value = '';
+            passwordInput.type = 'password';
+            togglePasswordBtn.innerHTML = '<i class="fas fa-eye"></i>';
+            loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+            loginBtn.disabled = false;
+        }
+        
+        // Update user info in UI
+        function updateUserInfo(user) {
+            const initials = user.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
+            
+            userAvatar.textContent = initials;
+            sidebarUsername.textContent = user.fullName;
+            sidebarRole.textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+            footerUsername.textContent = user.username;
+            headerUsername.textContent = user.fullName;
+        }
+        
+        // Handle logout
+        function handleLogout() {
+            if (currentUser) {
+                // Clear current user
+                currentUser = null;
+                isAdmin = false;
+                localStorage.removeItem('currentUser');
+            }
+            
+            // Switch to login screen
+            dashboard.style.display = 'none';
+            loginContainer.style.display = 'flex';
+            
+            showToast('Logged out successfully');
         }
         
         // Toggle dark mode
@@ -1375,11 +1955,15 @@
             const icon = isDarkMode ? 'sun' : 'moon';
             const text = isDarkMode ? 'Light Mode' : 'Dark Mode';
             
-            // Update header toggle
-            darkModeToggle.innerHTML = `<i class="fas fa-${icon}"></i><span>${text}</span>`;
+            // Update login toggle
+            if (loginDarkModeToggle) {
+                loginDarkModeToggle.innerHTML = `<i class="fas fa-${icon}"></i><span>${text}</span>`;
+            }
             
-            // Update sidebar toggle
-            darkModeToggleSidebar.innerHTML = `<i class="fas fa-${icon}"></i><span>${text}</span>`;
+            // Update dashboard toggle
+            if (dashboardDarkModeToggle) {
+                dashboardDarkModeToggle.innerHTML = `<i class="fas fa-${icon}"></i><span>${text}</span>`;
+            }
         }
         
         // Show toast notification
@@ -1391,323 +1975,478 @@
             }, 3000);
         }
         
-        // Save a new task
-        function saveTask() {
-            const island = taskIslandSelect.value;
-            const serviceNumber = taskServiceNumber.value.trim();
-            const messageEn = taskMessageEnInput.value.trim();
-            const messageDv = taskMessageDvInput.value.trim();
-            
-            if (!island || !serviceNumber || (!messageEn && !messageDv)) {
-                alert('Please fill in all required fields.');
-                return;
+        // Show modal
+        function showModal(modal) {
+            modal.style.display = 'flex';
+        }
+        
+        // Hide modal
+        function hideModal(modal) {
+            modal.style.display = 'none';
+            if (modal === editDataModal) {
+                currentEditItem = null;
+                currentDataType = null;
             }
+            if (modal === deleteModal) {
+                currentDeleteItem = null;
+                currentDataType = null;
+            }
+        }
+        
+        // Toggle sidebar
+        function toggleSidebar() {
+            if (isMobile) {
+                sidebar.classList.toggle('active');
+                sidebarOverlay.classList.toggle('active');
+            } else {
+                sidebar.classList.toggle('collapsed');
+            }
+        }
+        
+        // Close sidebar on mobile
+        function closeSidebarMobile() {
+            if (isMobile) {
+                sidebar.classList.remove('active');
+                sidebarOverlay.classList.remove('active');
+            }
+        }
+        
+        // Check if mobile
+        function checkMobile() {
+            isMobile = window.innerWidth <= 992;
+            if (isMobile) {
+                sidebar.classList.add('collapsed');
+            } else {
+                sidebar.classList.remove('collapsed');
+                sidebarOverlay.classList.remove('active');
+            }
+        }
+        
+        // Load users for admin panel
+        function loadUsers() {
+            if (!isAdmin) return;
             
-            const newTask = {
-                island: island,
-                serviceNumber: serviceNumber,
-                messageEn: messageEn,
-                messageDv: messageDv,
-                timestamp: new Date().toISOString()
-            };
-            
-            console.log("Saving task to Firebase:", newTask);
-            
-            // Save to Firebase
-            taskLogsRef.push(newTask)
-                .then(() => {
-                    console.log("Task saved successfully");
+            database.ref('users').once('value')
+                .then(snapshot => {
+                    users = [];
+                    const data = snapshot.val();
                     
-                    // Reset form
-                    taskIslandSelect.value = '';
-                    taskServiceNumber.value = '';
-                    taskMessageEnInput.value = '';
-                    taskMessageDvInput.value = '';
+                    if (data) {
+                        Object.keys(data).forEach(username => {
+                            users.push({
+                                username: username,
+                                ...data[username]
+                            });
+                        });
+                    }
                     
-                    showToast('Task saved successfully!');
+                    updateUsersTable();
+                    updateUserStats();
                 })
-                .catch((error) => {
-                    console.error('Error saving task:', error);
-                    alert('Error saving task. Please check console for details.');
+                .catch(error => {
+                    console.error('Error loading users:', error);
+                    showToast('Error loading users');
                 });
         }
         
-        // Save a new operation
-        function saveOperation() {
-            const island = operationIslandSelect.value;
-            const serviceNumber = operationServiceNumber.value.trim();
-            const messageEn = operationMessageEnInput.value.trim();
-            const messageDv = operationMessageDvInput.value.trim();
-            
-            if (!island || !serviceNumber || (!messageEn && !messageDv)) {
-                alert('Please fill in all required fields.');
-                return;
-            }
-            
-            const newOperation = {
-                island: island,
-                serviceNumber: serviceNumber,
-                messageEn: messageEn,
-                messageDv: messageDv,
-                timestamp: new Date().toISOString()
-            };
-            
-            console.log("Saving operation to Firebase:", newOperation);
-            
-            // Save to Firebase
-            operationLogsRef.push(newOperation)
-                .then(() => {
-                    console.log("Operation saved successfully");
-                    
-                    // Reset form
-                    operationIslandSelect.value = '';
-                    operationServiceNumber.value = '';
-                    operationMessageEnInput.value = '';
-                    operationMessageDvInput.value = '';
-                    
-                    showToast('Operation saved successfully!');
-                })
-                .catch((error) => {
-                    console.error('Error saving operation:', error);
-                    alert('Error saving operation. Please check console for details.');
-                });
-        }
-        
-        // Save a new location
-        function saveLocation() {
-            const island = locationIslandSelect.value;
-            const locationName = locationNameInput.value.trim();
-            const remarks = locationRemarksInput.value.trim();
-            
-            if (!island || !locationName || !remarks) {
-                alert('Please fill in all required fields.');
-                return;
-            }
-            
-            const newLocation = {
-                island: island,
-                locationName: locationName,
-                remarks: remarks,
-                timestamp: new Date().toISOString()
-            };
-            
-            console.log("Saving location to Firebase:", newLocation);
-            
-            // Save to Firebase
-            locationLogsRef.push(newLocation)
-                .then(() => {
-                    console.log("Location saved successfully");
-                    
-                    // Reset form
-                    locationIslandSelect.value = '';
-                    locationNameInput.value = '';
-                    locationRemarksInput.value = '';
-                    
-                    showToast('Location saved successfully!');
-                })
-                .catch((error) => {
-                    console.error('Error saving location:', error);
-                    alert('Error saving location. Please check console for details.');
-                });
-        }
-        
-        // Render task logs
-        function renderTaskLogs() {
-            const filterIsland = taskFilterIsland.value;
-            const filteredTasks = filterIsland ? 
-                taskLogs.filter(task => task.island === filterIsland) : 
-                taskLogs;
-            
-            // Update counts
-            taskTotalCount.textContent = `Total Tasks: ${taskLogs.length}`;
-            taskFilteredCount.textContent = `Filtered: ${filteredTasks.length}`;
-            
-            if (taskLogs.length === 0) {
-                taskLogContainer.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-tasks"></i>
-                        <p>No task logs found. ${filterIsland ? 'Try changing the filter.' : 'Create your first task!'}</p>
-                    </div>
+        // Update users table
+        function updateUsersTable() {
+            if (!users.length) {
+                usersTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center;">No users found</td>
+                    </tr>
                 `;
                 return;
             }
             
-            if (filteredTasks.length === 0) {
-                taskLogContainer.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-filter"></i>
-                        <p>No tasks found for selected island. Try changing the filter.</p>
-                    </div>
+            usersTableBody.innerHTML = users.map(user => {
+                const lastLogin = user.lastLogin ? 
+                    new Date(user.lastLogin).toLocaleString() : 
+                    'Never logged in';
+                
+                return `
+                    <tr>
+                        <td>${escapeHtml(user.username)}</td>
+                        <td>${escapeHtml(user.fullName || 'N/A')}</td>
+                        <td>${escapeHtml(user.role || 'user')}</td>
+                        <td>${lastLogin}</td>
+                        <td>
+                            <span class="user-status ${user.isActive ? 'status-active' : 'status-inactive'}">
+                                ${user.isActive ? 'Active' : 'Inactive'}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="action-icons">
+                                ${user.username !== 'av_5637' ? `
+                                    <i class="fas fa-edit action-icon" onclick="editUser('${escapeHtml(user.username)}')" title="Edit User"></i>
+                                    <i class="fas fa-trash action-icon" onclick="deleteUser('${escapeHtml(user.username)}')" title="Delete User"></i>
+                                    <i class="fas fa-${user.isActive ? 'ban' : 'check'} action-icon" 
+                                       onclick="toggleUserStatus('${escapeHtml(user.username)}', ${!user.isActive})" 
+                                       title="${user.isActive ? 'Deactivate' : 'Activate'}">
+                                    </i>
+                                ` : '<span style="color: var(--text-light);">Protected</span>'}
+                            </div>
+                        </td>
+                    </tr>
                 `;
+            }).join('');
+        }
+        
+        // Update user statistics
+        function updateUserStats() {
+            const total = users.length;
+            const active = users.filter(u => u.isActive).length;
+            const inactive = total - active;
+            
+            // Get today's date
+            const today = new Date().toDateString();
+            
+            // Count today's logins
+            const todayLogins = users.filter(u => {
+                if (!u.lastLogin) return false;
+                const lastLoginDate = new Date(u.lastLogin).toDateString();
+                return lastLoginDate === today;
+            }).length;
+            
+            totalUsersElement.textContent = total;
+            activeUsersElement.textContent = active;
+            inactiveUsersElement.textContent = inactive;
+            todayLoginsElement.textContent = todayLogins;
+        }
+        
+        // Save new user
+        async function saveNewUser() {
+            if (!isAdmin) {
+                showToast('Only av_5637 can add users');
                 return;
             }
             
-            taskLogContainer.innerHTML = filteredTasks.map(log => {
-                const timestamp = new Date(log.timestamp).toLocaleString();
-                let messageHtml = '';
-                if (log.messageEn && log.messageDv) {
-                    messageHtml = `
-                        <div class="log-message">${escapeHtml(log.messageEn)}</div>
-                        <div class="log-message dhivehi-text">${escapeHtml(log.messageDv)}</div>
-                    `;
-                } else if (log.messageEn) {
-                    messageHtml = `<div class="log-message">${escapeHtml(log.messageEn)}</div>`;
-                } else if (log.messageDv) {
-                    messageHtml = `<div class="log-message dhivehi-text">${escapeHtml(log.messageDv)}</div>`;
+            const username = document.getElementById('new-username').value.trim();
+            const password = document.getElementById('new-password').value.trim();
+            const fullName = document.getElementById('new-fullname').value.trim();
+            const role = document.getElementById('new-role').value;
+            const isActive = document.getElementById('new-user-active').checked;
+            
+            if (!username || !password || !fullName) {
+                showToast('Please fill all fields');
+                return;
+            }
+            
+            // Check if username exists
+            const snapshot = await database.ref('users/' + username).once('value');
+            if (snapshot.exists()) {
+                showToast('Username already exists');
+                return;
+            }
+            
+            // Create user object
+            const userData = {
+                username: username,
+                password: password,
+                fullName: fullName,
+                role: role,
+                isActive: isActive,
+                createdBy: currentUser.username,
+                createdAt: new Date().toISOString(),
+                lastLogin: null
+            };
+            
+            // Save to database
+            try {
+                await database.ref('users/' + username).set(userData);
+                
+                // Clear form
+                document.getElementById('new-username').value = '';
+                document.getElementById('new-password').value = '';
+                document.getElementById('new-fullname').value = '';
+                document.getElementById('new-role').value = 'user';
+                document.getElementById('new-user-active').checked = true;
+                
+                // Close modal
+                hideModal(addUserModal);
+                
+                // Refresh user list
+                loadUsers();
+                
+                showToast('User created successfully');
+                
+            } catch (error) {
+                console.error('Error creating user:', error);
+                showToast('Error creating user');
+            }
+        }
+        
+        // Edit user
+        function editUser(username) {
+            if (!isAdmin) {
+                showToast('Only av_5637 can edit users');
+                return;
+            }
+            
+            const user = users.find(u => u.username === username);
+            if (!user) return;
+            
+            // Prevent editing av_5637
+            if (username === 'av_5637') {
+                showToast('Cannot edit main administrator account');
+                return;
+            }
+            
+            currentEditItem = user;
+            currentDataType = 'user';
+            
+            editModalTitle.textContent = 'Edit User';
+            editModalContent.innerHTML = `
+                <div class="form-group">
+                    <label for="edit-username">Username</label>
+                    <input type="text" id="edit-username" value="${escapeHtml(user.username)}" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="edit-password">Password</label>
+                    <input type="password" id="edit-password" placeholder="Leave blank to keep current password">
+                </div>
+                <div class="form-group">
+                    <label for="edit-fullname">Full Name</label>
+                    <input type="text" id="edit-fullname" value="${escapeHtml(user.fullName || '')}">
+                </div>
+                <div class="form-group">
+                    <label for="edit-role">Role</label>
+                    <select id="edit-role">
+                        <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Administrator</option>
+                        <option value="user" ${user.role === 'user' ? 'selected' : ''}>Regular User</option>
+                        <option value="viewer" ${user.role === 'viewer' ? 'selected' : ''}>Viewer (Read Only)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="edit-user-active" ${user.isActive ? 'checked' : ''}> Active Account
+                    </label>
+                </div>
+            `;
+            
+            showModal(editDataModal);
+        }
+        
+        // Delete user
+        function deleteUser(username) {
+            if (!isAdmin) {
+                showToast('Only av_5637 can delete users');
+                return;
+            }
+            
+            if (username === 'av_5637') {
+                showToast('Cannot delete the main administrator account');
+                return;
+            }
+            
+            currentDeleteItem = username;
+            currentDataType = 'user';
+            
+            deleteMessage.textContent = `Are you sure you want to delete user "${username}"? This action cannot be undone.`;
+            showModal(deleteModal);
+        }
+        
+        // Toggle user status
+        async function toggleUserStatus(username, newStatus) {
+            if (!isAdmin) {
+                showToast('Only av_5637 can modify user status');
+                return;
+            }
+            
+            if (username === 'av_5637') {
+                showToast('Cannot modify the main administrator account');
+                return;
+            }
+            
+            try {
+                await database.ref('users/' + username).update({
+                    isActive: newStatus
+                });
+                
+                loadUsers();
+                showToast(`User ${newStatus ? 'activated' : 'deactivated'} successfully`);
+                
+            } catch (error) {
+                console.error('Error updating user status:', error);
+                showToast('Error updating user status');
+            }
+        }
+        
+        // Save edit
+        async function saveEdit() {
+            if (!currentEditItem || !currentDataType) return;
+            
+            try {
+                if (currentDataType === 'user') {
+                    if (!isAdmin) {
+                        showToast('Only av_5637 can edit users');
+                        return;
+                    }
+                    
+                    const username = currentEditItem.username;
+                    const password = document.getElementById('edit-password').value.trim();
+                    const fullName = document.getElementById('edit-fullname').value.trim();
+                    const role = document.getElementById('edit-role').value;
+                    const isActive = document.getElementById('edit-user-active').checked;
+                    
+                    const updates = {
+                        fullName: fullName,
+                        role: role,
+                        isActive: isActive,
+                        updatedAt: new Date().toISOString(),
+                        updatedBy: currentUser.username
+                    };
+                    
+                    // Only update password if provided
+                    if (password) {
+                        updates.password = password;
+                    }
+                    
+                    await database.ref('users/' + username).update(updates);
+                    
+                    hideModal(editDataModal);
+                    loadUsers();
+                    showToast('User updated successfully');
+                    
+                } else if (currentDataType === 'task') {
+                    if (!isAdmin) {
+                        showToast('Only av_5637 can edit tasks');
+                        return;
+                    }
+                    
+                    const taskId = currentEditItem.id;
+                    const island = document.getElementById('edit-task-island').value;
+                    const serviceNumber = document.getElementById('edit-task-service-number').value.trim();
+                    const messageEn = document.getElementById('edit-task-message-en').value.trim();
+                    const messageDv = document.getElementById('edit-task-message-dv').value.trim();
+                    
+                    if (!island || !serviceNumber || (!messageEn && !messageDv)) {
+                        showToast('Please fill in all required fields');
+                        return;
+                    }
+                    
+                    const updates = {
+                        island: island,
+                        serviceNumber: serviceNumber,
+                        messageEn: messageEn,
+                        messageDv: messageDv,
+                        updatedAt: new Date().toISOString(),
+                        updatedBy: currentUser.username
+                    };
+                    
+                    await database.ref('taskLogs/' + taskId).update(updates);
+                    
+                    hideModal(editDataModal);
+                    loadTaskLogs();
+                    showToast('Task updated successfully');
+                    
+                } else if (currentDataType === 'operation') {
+                    if (!isAdmin) {
+                        showToast('Only av_5637 can edit operations');
+                        return;
+                    }
+                    
+                    const operationId = currentEditItem.id;
+                    const island = document.getElementById('edit-operation-island').value;
+                    const serviceNumber = document.getElementById('edit-operation-service-number').value.trim();
+                    const messageEn = document.getElementById('edit-operation-message-en').value.trim();
+                    const messageDv = document.getElementById('edit-operation-message-dv').value.trim();
+                    
+                    if (!island || !serviceNumber || (!messageEn && !messageDv)) {
+                        showToast('Please fill in all required fields');
+                        return;
+                    }
+                    
+                    const updates = {
+                        island: island,
+                        serviceNumber: serviceNumber,
+                        messageEn: messageEn,
+                        messageDv: messageDv,
+                        updatedAt: new Date().toISOString(),
+                        updatedBy: currentUser.username
+                    };
+                    
+                    await database.ref('operationLogs/' + operationId).update(updates);
+                    
+                    hideModal(editDataModal);
+                    loadOperationLogs();
+                    showToast('Operation updated successfully');
+                    
+                } else if (currentDataType === 'location') {
+                    if (!isAdmin) {
+                        showToast('Only av_5637 can edit locations');
+                        return;
+                    }
+                    
+                    const locationId = currentEditItem.id;
+                    const island = document.getElementById('edit-location-island').value;
+                    const locationName = document.getElementById('edit-location-name').value.trim();
+                    const remarks = document.getElementById('edit-location-remarks').value.trim();
+                    
+                    if (!island || !locationName || !remarks) {
+                        showToast('Please fill in all required fields');
+                        return;
+                    }
+                    
+                    const updates = {
+                        island: island,
+                        locationName: locationName,
+                        remarks: remarks,
+                        updatedAt: new Date().toISOString(),
+                        updatedBy: currentUser.username
+                    };
+                    
+                    await database.ref('locationLogs/' + locationId).update(updates);
+                    
+                    hideModal(editDataModal);
+                    loadLocationLogs();
+                    showToast('Location updated successfully');
                 }
                 
-                return `
-                    <div class="log-item">
-                        <div class="log-header">
-                            <span class="island-name">${escapeHtml(log.island)}</span>
-                            <span class="timestamp">${timestamp}</span>
-                        </div>
-                        <div class="service-number">Service Number: ${escapeHtml(log.serviceNumber)}</div>
-                        ${messageHtml}
-                        <div class="log-actions">
-                            <button class="action-btn copy-btn" onclick="copyToClipboard('${escapeHtml(log.messageEn || '')}', '${escapeHtml(log.messageDv || '')}')">
-                                <i class="fas fa-copy"></i> Copy
-                            </button>
-                            <button class="action-btn edit-btn" onclick="openEditModal('${log.id}', 'task')">
-                                <i class="fas fa-edit"></i> Edit
-                            </button>
-                            <button class="action-btn delete-btn" onclick="deleteLog('${log.id}', 'task')">
-                                <i class="fas fa-trash"></i> Delete
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+            } catch (error) {
+                console.error('Error saving edit:', error);
+                showToast('Error saving changes');
+            }
         }
         
-        // Render operation logs
-        function renderOperationLogs() {
-            const filterIsland = operationFilterIsland.value;
-            const filteredOperations = filterIsland ? 
-                operationLogs.filter(operation => operation.island === filterIsland) : 
-                operationLogs;
+        // Confirm delete
+        async function confirmDelete() {
+            if (!currentDeleteItem || !currentDataType) return;
             
-            // Update counts
-            operationTotalCount.textContent = `Total Operations: ${operationLogs.length}`;
-            operationFilteredCount.textContent = `Filtered: ${filteredOperations.length}`;
-            
-            if (operationLogs.length === 0) {
-                operationLogContainer.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-search"></i>
-                        <p>No operation logs found. ${filterIsland ? 'Try changing the filter.' : 'Create your first operation!'}</p>
-                    </div>
-                `;
+            if (!isAdmin) {
+                showToast('Only av_5637 can delete items');
                 return;
             }
             
-            if (filteredOperations.length === 0) {
-                operationLogContainer.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-filter"></i>
-                        <p>No operations found for selected island. Try changing the filter.</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            operationLogContainer.innerHTML = filteredOperations.map(log => {
-                const timestamp = new Date(log.timestamp).toLocaleString();
-                let messageHtml = '';
-                if (log.messageEn && log.messageDv) {
-                    messageHtml = `
-                        <div class="log-message">${escapeHtml(log.messageEn)}</div>
-                        <div class="log-message dhivehi-text">${escapeHtml(log.messageDv)}</div>
-                    `;
-                } else if (log.messageEn) {
-                    messageHtml = `<div class="log-message">${escapeHtml(log.messageEn)}</div>`;
-                } else if (log.messageDv) {
-                    messageHtml = `<div class="log-message dhivehi-text">${escapeHtml(log.messageDv)}</div>`;
+            try {
+                if (currentDataType === 'user') {
+                    await database.ref('users/' + currentDeleteItem).remove();
+                    showToast('User deleted successfully');
+                    loadUsers();
+                    
+                } else if (currentDataType === 'task') {
+                    await database.ref('taskLogs/' + currentDeleteItem).remove();
+                    showToast('Task deleted successfully');
+                    loadTaskLogs();
+                    
+                } else if (currentDataType === 'operation') {
+                    await database.ref('operationLogs/' + currentDeleteItem).remove();
+                    showToast('Operation deleted successfully');
+                    loadOperationLogs();
+                    
+                } else if (currentDataType === 'location') {
+                    await database.ref('locationLogs/' + currentDeleteItem).remove();
+                    showToast('Location deleted successfully');
+                    loadLocationLogs();
                 }
                 
-                return `
-                    <div class="log-item operation-log-item">
-                        <div class="log-header">
-                            <span class="island-name">${escapeHtml(log.island)}</span>
-                            <span class="timestamp">${timestamp}</span>
-                        </div>
-                        <div class="service-number">Service Number: ${escapeHtml(log.serviceNumber)}</div>
-                        ${messageHtml}
-                        <div class="log-actions">
-                            <button class="action-btn copy-btn" onclick="copyToClipboard('${escapeHtml(log.messageEn || '')}', '${escapeHtml(log.messageDv || '')}')">
-                                <i class="fas fa-copy"></i> Copy
-                            </button>
-                            <button class="action-btn edit-btn" onclick="openEditModal('${log.id}', 'operation')">
-                                <i class="fas fa-edit"></i> Edit
-                            </button>
-                            <button class="action-btn delete-btn" onclick="deleteLog('${log.id}', 'operation')">
-                                <i class="fas fa-trash"></i> Delete
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-        
-        // Render location logs
-        function renderLocationLogs() {
-            const filterIsland = locationFilterIsland.value;
-            const filteredLocations = filterIsland ? 
-                locationLogs.filter(location => location.island === filterIsland) : 
-                locationLogs;
-            
-            // Update counts
-            locationTotalCount.textContent = `Total Locations: ${locationLogs.length}`;
-            locationFilteredCount.textContent = `Filtered: ${filteredLocations.length}`;
-            
-            if (locationLogs.length === 0) {
-                locationLogContainer.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <p>No location logs found. ${filterIsland ? 'Try changing the filter.' : 'Create your first location!'}</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            if (filteredLocations.length === 0) {
-                locationLogContainer.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-filter"></i>
-                        <p>No locations found for selected island. Try changing the filter.</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            locationLogContainer.innerHTML = filteredLocations.map(log => {
-                const timestamp = new Date(log.timestamp).toLocaleString();
+                hideModal(deleteModal);
                 
-                return `
-                    <div class="log-item location-log-item">
-                        <div class="log-header">
-                            <span class="island-name">${escapeHtml(log.island)}</span>
-                            <span class="timestamp">${timestamp}</span>
-                        </div>
-                        <div class="location-name"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(log.locationName)}</div>
-                        <div class="log-message">${escapeHtml(log.remarks)}</div>
-                        <div class="log-actions">
-                            <button class="action-btn copy-location-btn" onclick="copySingleToClipboard('${escapeHtml(log.locationName)}', 'Location Name')">
-                                <i class="fas fa-copy"></i> Copy Location
-                            </button>
-                            <button class="action-btn copy-remarks-btn" onclick="copySingleToClipboard('${escapeHtml(log.remarks)}', 'Remarks')">
-                                <i class="fas fa-copy"></i> Copy Remarks
-                            </button>
-                            <button class="action-btn edit-btn" onclick="openEditModal('${log.id}', 'location')">
-                                <i class="fas fa-edit"></i> Edit
-                            </button>
-                            <button class="action-btn delete-btn" onclick="deleteLog('${log.id}', 'location')">
-                                <i class="fas fa-trash"></i> Delete
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+            } catch (error) {
+                console.error('Error deleting item:', error);
+                showToast('Error deleting item');
+            }
         }
         
         // Escape HTML to prevent XSS
@@ -1718,195 +2457,721 @@
             return div.innerHTML;
         }
         
-        // Copy message to clipboard
-        function copyToClipboard(messageEn, messageDv) {
-            let textToCopy = '';
+        // Initialize logging functionality
+        function initLogging() {
+            // Set up Firebase references for logs
+            const taskLogsRef = database.ref('taskLogs');
+            const operationLogsRef = database.ref('operationLogs');
+            const locationLogsRef = database.ref('locationLogs');
             
-            if (messageEn && messageDv) {
-                textToCopy = `${messageEn}\n\n${messageDv}`;
-            } else if (messageEn) {
-                textToCopy = messageEn;
-            } else if (messageDv) {
-                textToCopy = messageDv;
-            }
-            
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                showToast('Message copied to clipboard!');
-            }).catch(err => {
-                console.error('Failed to copy: ', err);
-                // Fallback for older browsers
-                const textArea = document.createElement('textarea');
-                textArea.value = textToCopy;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                showToast('Message copied to clipboard!');
-            });
-        }
-        
-        // Copy single item to clipboard
-        function copySingleToClipboard(text, itemName) {
-            if (!text) {
-                showToast('Nothing to copy!');
-                return;
-            }
-            
-            navigator.clipboard.writeText(text).then(() => {
-                showToast(`${itemName} copied to clipboard!`);
-            }).catch(err => {
-                console.error('Failed to copy: ', err);
-                // Fallback for older browsers
-                const textArea = document.createElement('textarea');
-                textArea.value = text;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                showToast(`${itemName} copied to clipboard!`);
-            });
-        }
-        
-        // Open edit modal
-        function openEditModal(id, type) {
-            currentEditId = id;
-            currentEditType = type;
-            
-            let log;
-            if (type === 'task') {
-                log = taskLogs.find(l => l.id === id);
-            } else if (type === 'operation') {
-                log = operationLogs.find(l => l.id === id);
-            } else if (type === 'location') {
-                log = locationLogs.find(l => l.id === id);
-            }
-            
-            if (log) {
-                if (type === 'location') {
-                    editModalTitle.textContent = 'Edit Location Entry';
-                    editLocationFields.style.display = 'block';
-                    editTaskFields.style.display = 'none';
+            // Load task logs
+            function loadTaskLogs() {
+                taskLogsRef.on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    taskLogs = data ? Object.entries(data).map(([key, value]) => ({
+                        id: key,
+                        ...value
+                    })) : [];
                     
-                    editIsland.value = log.island;
-                    editLocationName.value = log.locationName || '';
-                    editLocationRemarks.value = log.remarks || '';
-                } else {
-                    editModalTitle.textContent = type === 'task' ? 'Edit Task Entry' : 'Edit Operation Entry';
-                    editLocationFields.style.display = 'none';
-                    editTaskFields.style.display = 'block';
-                    
-                    editIslandTask.value = log.island;
-                    editServiceNumberTask.value = log.serviceNumber || '';
-                    editMessageEnInput.value = log.messageEn || '';
-                    editMessageDvInput.value = log.messageDv || '';
-                }
-                editModal.style.display = 'flex';
+                    taskLogs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    renderTaskLogs();
+                });
             }
-        }
-        
-        // Update log entry
-        function updateLog() {
-            if (currentEditType === 'location') {
-                const island = editIsland.value;
-                const locationName = editLocationName.value.trim();
-                const remarks = editLocationRemarks.value.trim();
-                
-                if (!island || !locationName || !remarks) {
-                    alert('Please fill in all required fields.');
-                    return;
-                }
-                
-                const updatedLog = {
-                    island: island,
-                    locationName: locationName,
-                    remarks: remarks,
-                    timestamp: new Date().toISOString()
-                };
-                
-                console.log("Updating location:", currentEditId, updatedLog);
-                
-                // Update in Firebase
-                locationLogsRef.child(currentEditId).update(updatedLog)
-                    .then(() => {
-                        editModal.style.display = 'none';
-                        showToast('Location updated successfully!');
-                    })
-                    .catch(error => {
-                        console.error('Error updating location:', error);
-                        alert('Error updating location. Please check console for details.');
-                    });
+            
+            // Load operation logs
+            function loadOperationLogs() {
+                operationLogsRef.on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    operationLogs = data ? Object.entries(data).map(([key, value]) => ({
+                        id: key,
+                        ...value
+                    })) : [];
                     
-            } else {
-                const island = editIslandTask.value;
-                const serviceNumber = editServiceNumberTask.value.trim();
-                const messageEn = editMessageEnInput.value.trim();
-                const messageDv = editMessageDvInput.value.trim();
+                    operationLogs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    renderOperationLogs();
+                });
+            }
+            
+            // Load location logs
+            function loadLocationLogs() {
+                locationLogsRef.on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    locationLogs = data ? Object.entries(data).map(([key, value]) => ({
+                        id: key,
+                        ...value
+                    })) : [];
+                    
+                    locationLogs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    renderLocationLogs();
+                });
+            }
+            
+            // Save task
+            saveTaskBtn.addEventListener('click', () => {
+                const island = taskIslandSelect.value;
+                const serviceNumber = taskServiceNumber.value.trim();
+                const messageEn = taskMessageEnInput.value.trim();
+                const messageDv = taskMessageDvInput.value.trim();
                 
                 if (!island || !serviceNumber || (!messageEn && !messageDv)) {
-                    alert('Please fill in all required fields.');
+                    showToast('Please fill in all required fields');
                     return;
                 }
                 
-                const updatedLog = {
+                const newTask = {
                     island: island,
                     serviceNumber: serviceNumber,
                     messageEn: messageEn,
                     messageDv: messageDv,
-                    timestamp: new Date().toISOString()
+                    timestamp: new Date().toISOString(),
+                    createdBy: currentUser.username
                 };
                 
-                console.log("Updating log:", currentEditId, updatedLog);
-                
-                const ref = currentEditType === 'task' ? taskLogsRef : operationLogsRef;
-                
-                // Update in Firebase
-                ref.child(currentEditId).update(updatedLog)
+                taskLogsRef.push(newTask)
                     .then(() => {
-                        editModal.style.display = 'none';
-                        showToast('Log updated successfully!');
+                        taskIslandSelect.value = '';
+                        taskServiceNumber.value = '';
+                        taskMessageEnInput.value = '';
+                        taskMessageDvInput.value = '';
+                        showToast('Task saved successfully');
                     })
                     .catch(error => {
-                        console.error('Error updating log:', error);
-                        alert('Error updating log. Please check console for details.');
+                        console.error('Error saving task:', error);
+                        showToast('Error saving task');
                     });
+            });
+            
+            // Save operation
+            saveOperationBtn.addEventListener('click', () => {
+                const island = operationIslandSelect.value;
+                const serviceNumber = operationServiceNumber.value.trim();
+                const messageEn = operationMessageEnInput.value.trim();
+                const messageDv = operationMessageDvInput.value.trim();
+                
+                if (!island || !serviceNumber || (!messageEn && !messageDv)) {
+                    showToast('Please fill in all required fields');
+                    return;
+                }
+                
+                const newOperation = {
+                    island: island,
+                    serviceNumber: serviceNumber,
+                    messageEn: messageEn,
+                    messageDv: messageDv,
+                    timestamp: new Date().toISOString(),
+                    createdBy: currentUser.username
+                };
+                
+                operationLogsRef.push(newOperation)
+                    .then(() => {
+                        operationIslandSelect.value = '';
+                        operationServiceNumber.value = '';
+                        operationMessageEnInput.value = '';
+                        operationMessageDvInput.value = '';
+                        showToast('Operation saved successfully');
+                    })
+                    .catch(error => {
+                        console.error('Error saving operation:', error);
+                        showToast('Error saving operation');
+                    });
+            });
+            
+            // Save location
+            saveLocationBtn.addEventListener('click', () => {
+                const island = locationIslandSelect.value;
+                const locationName = locationNameInput.value.trim();
+                const remarks = locationRemarksInput.value.trim();
+                
+                if (!island || !locationName || !remarks) {
+                    showToast('Please fill in all required fields');
+                    return;
+                }
+                
+                const newLocation = {
+                    island: island,
+                    locationName: locationName,
+                    remarks: remarks,
+                    timestamp: new Date().toISOString(),
+                    createdBy: currentUser.username
+                };
+                
+                locationLogsRef.push(newLocation)
+                    .then(() => {
+                        locationIslandSelect.value = '';
+                        locationNameInput.value = '';
+                        locationRemarksInput.value = '';
+                        showToast('Location saved successfully');
+                    })
+                    .catch(error => {
+                        console.error('Error saving location:', error);
+                        showToast('Error saving location');
+                    });
+            });
+            
+            // Filter events
+            taskFilterIsland.addEventListener('change', renderTaskLogs);
+            operationFilterIsland.addEventListener('change', renderOperationLogs);
+            locationFilterIsland.addEventListener('change', renderLocationLogs);
+            
+            // Language tabs
+            document.querySelectorAll('.language-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const lang = this.getAttribute('data-lang');
+                    const container = this.closest('.form-group');
+                    
+                    // Update active tab
+                    container.querySelectorAll('.language-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show/hide message containers
+                    container.querySelectorAll('.message-container').forEach(mc => mc.classList.remove('active'));
+                    const messageContainer = container.querySelector(`#${container.id}-message-${lang}`);
+                    if (messageContainer) messageContainer.classList.add('active');
+                });
+            });
+            
+            // Initialize the main admin user if not exists
+            function initializeAdminUser() {
+                const adminRef = database.ref('users/av_5637');
+                adminRef.once('value').then(snapshot => {
+                    if (!snapshot.exists()) {
+                        // Create main admin user
+                        const adminUser = {
+                            username: 'av_5637',
+                            password: '8555', // Default password
+                            fullName: 'Ahmed Vaseem',
+                            role: 'admin',
+                            isActive: true,
+                            createdBy: 'system',
+                            createdAt: new Date().toISOString(),
+                            lastLogin: null
+                        };
+                        adminRef.set(adminUser);
+                        console.log('Main admin user created');
+                    }
+                });
             }
+            
+            // Call initialization
+            initializeAdminUser();
+            
+            // Load initial data
+            loadTaskLogs();
+            loadOperationLogs();
+            loadLocationLogs();
         }
         
-        // Delete log entry
-        function deleteLog(id, type) {
-            if (!confirm('Are you sure you want to delete this log entry?')) {
+        // Edit task function
+        function editTask(taskId) {
+            if (!isAdmin) {
+                showToast('Only av_5637 can edit tasks');
                 return;
             }
             
-            console.log("Deleting log:", id, type);
+            const task = taskLogs.find(t => t.id === taskId);
+            if (!task) return;
             
-            try {
-                let ref;
-                if (type === 'task') {
-                    ref = taskLogsRef;
-                } else if (type === 'operation') {
-                    ref = operationLogsRef;
-                } else if (type === 'location') {
-                    ref = locationLogsRef;
-                }
+            currentEditItem = task;
+            currentDataType = 'task';
+            
+            editModalTitle.textContent = 'Edit Task';
+            editModalContent.innerHTML = `
+                <div class="form-group">
+                    <label for="edit-task-island">Select Island</label>
+                    <select id="edit-task-island">
+                        <option value="F.Feeali" ${task.island === 'F.Feeali' ? 'selected' : ''}>F.Feeali</option>
+                        <option value="F.Bilehdhoo" ${task.island === 'F.Bilehdhoo' ? 'selected' : ''}>F.Bilehdhoo</option>
+                        <option value="F.Dharaboodhoo" ${task.island === 'F.Dharaboodhoo' ? 'selected' : ''}>F.Dharaboodhoo</option>
+                        <option value="F.Magoodhoo" ${task.island === 'F.Magoodhoo' ? 'selected' : ''}>F.Magoodhoo</option>
+                        <option value="F.Nilandhoo" ${task.island === 'F.Nilandhoo' ? 'selected' : ''}>F.Nilandhoo</option>
+                    </select>
+                </div>
                 
-                // Delete from Firebase
-                ref.child(id).remove()
-                    .then(() => {
-                        showToast('Log deleted successfully!');
-                    })
-                    .catch(error => {
-                        console.error('Error deleting log:', error);
-                        alert('Error deleting log. Please check console for details.');
+                <div class="form-group">
+                    <label for="edit-task-service-number">Officer Service Number</label>
+                    <input type="text" id="edit-task-service-number" value="${escapeHtml(task.serviceNumber || '')}" placeholder="Enter officer service number">
+                </div>
+                
+                <div class="form-group">
+                    <label>Task Message</label>
+                    <div class="language-tabs">
+                        <button type="button" class="language-tab active" data-lang="en">English</button>
+                        <button type="button" class="language-tab" data-lang="dv">Dhivehi</button>
+                    </div>
+                    <div id="edit-task-message-en" class="message-container active">
+                        <textarea id="edit-task-message-en" placeholder="Enter task message in English...">${escapeHtml(task.messageEn || '')}</textarea>
+                    </div>
+                    <div id="edit-task-message-dv" class="message-container">
+                        <textarea id="edit-task-message-dv" class="dhivehi-input" placeholder="ޓާސްކް މެސެޖެއް ލިޔޭ...">${escapeHtml(task.messageDv || '')}</textarea>
+                    </div>
+                </div>
+            `;
+            
+            // Reinitialize language tabs in modal
+            setTimeout(() => {
+                editModalContent.querySelectorAll('.language-tab').forEach(tab => {
+                    tab.addEventListener('click', function() {
+                        const lang = this.getAttribute('data-lang');
+                        const container = this.closest('.form-group');
+                        
+                        // Update active tab
+                        container.querySelectorAll('.language-tab').forEach(t => t.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Show/hide message containers
+                        container.querySelectorAll('.message-container').forEach(mc => mc.classList.remove('active'));
+                        const messageContainer = container.querySelector(`#edit-task-message-${lang}`);
+                        if (messageContainer) messageContainer.classList.add('active');
                     });
-                
-            } catch (error) {
-                console.error('Error deleting log:', error);
-                alert('Error deleting log. Please check console for details.');
-            }
+                });
+            }, 100);
+            
+            showModal(editDataModal);
         }
         
-        // Initialize the application
+        // Delete task function
+        function deleteTask(taskId) {
+            if (!isAdmin) {
+                showToast('Only av_5637 can delete tasks');
+                return;
+            }
+            
+            currentDeleteItem = taskId;
+            currentDataType = 'task';
+            
+            const task = taskLogs.find(t => t.id === taskId);
+            const island = task ? task.island : 'this task';
+            
+            deleteMessage.textContent = `Are you sure you want to delete ${island} task?`;
+            showModal(deleteModal);
+        }
+        
+        // Edit operation function
+        function editOperation(operationId) {
+            if (!isAdmin) {
+                showToast('Only av_5637 can edit operations');
+                return;
+            }
+            
+            const operation = operationLogs.find(o => o.id === operationId);
+            if (!operation) return;
+            
+            currentEditItem = operation;
+            currentDataType = 'operation';
+            
+            editModalTitle.textContent = 'Edit Operation';
+            editModalContent.innerHTML = `
+                <div class="form-group">
+                    <label for="edit-operation-island">Select Island</label>
+                    <select id="edit-operation-island">
+                        <option value="F.Feeali" ${operation.island === 'F.Feeali' ? 'selected' : ''}>F.Feeali</option>
+                        <option value="F.Bilehdhoo" ${operation.island === 'F.Bilehdhoo' ? 'selected' : ''}>F.Bilehdhoo</option>
+                        <option value="F.Dharaboodhoo" ${operation.island === 'F.Dharaboodhoo' ? 'selected' : ''}>F.Dharaboodhoo</option>
+                        <option value="F.Magoodhoo" ${operation.island === 'F.Magoodhoo' ? 'selected' : ''}>F.Magoodhoo</option>
+                        <option value="F.Nilandhoo" ${operation.island === 'F.Nilandhoo' ? 'selected' : ''}>F.Nilandhoo</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-operation-service-number">Officer Service Number</label>
+                    <input type="text" id="edit-operation-service-number" value="${escapeHtml(operation.serviceNumber || '')}" placeholder="Enter officer service number">
+                </div>
+                
+                <div class="form-group">
+                    <label>Operation Message</label>
+                    <div class="language-tabs">
+                        <button type="button" class="language-tab active" data-lang="en">English</button>
+                        <button type="button" class="language-tab" data-lang="dv">Dhivehi</button>
+                    </div>
+                    <div id="edit-operation-message-en" class="message-container active">
+                        <textarea id="edit-operation-message-en" placeholder="Enter operation message in English...">${escapeHtml(operation.messageEn || '')}</textarea>
+                    </div>
+                    <div id="edit-operation-message-dv" class="message-container">
+                        <textarea id="edit-operation-message-dv" class="dhivehi-input" placeholder="އޮޕަރޭޝަން މެސެޖެއް ލިޔޭ...">${escapeHtml(operation.messageDv || '')}</textarea>
+                    </div>
+                </div>
+            `;
+            
+            // Reinitialize language tabs in modal
+            setTimeout(() => {
+                editModalContent.querySelectorAll('.language-tab').forEach(tab => {
+                    tab.addEventListener('click', function() {
+                        const lang = this.getAttribute('data-lang');
+                        const container = this.closest('.form-group');
+                        
+                        // Update active tab
+                        container.querySelectorAll('.language-tab').forEach(t => t.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Show/hide message containers
+                        container.querySelectorAll('.message-container').forEach(mc => mc.classList.remove('active'));
+                        const messageContainer = container.querySelector(`#edit-operation-message-${lang}`);
+                        if (messageContainer) messageContainer.classList.add('active');
+                    });
+                });
+            }, 100);
+            
+            showModal(editDataModal);
+        }
+        
+        // Delete operation function
+        function deleteOperation(operationId) {
+            if (!isAdmin) {
+                showToast('Only av_5637 can delete operations');
+                return;
+            }
+            
+            currentDeleteItem = operationId;
+            currentDataType = 'operation';
+            
+            const operation = operationLogs.find(o => o.id === operationId);
+            const island = operation ? operation.island : 'this operation';
+            
+            deleteMessage.textContent = `Are you sure you want to delete ${island} operation?`;
+            showModal(deleteModal);
+        }
+        
+        // Edit location function
+        function editLocation(locationId) {
+            if (!isAdmin) {
+                showToast('Only av_5637 can edit locations');
+                return;
+            }
+            
+            const location = locationLogs.find(l => l.id === locationId);
+            if (!location) return;
+            
+            currentEditItem = location;
+            currentDataType = 'location';
+            
+            editModalTitle.textContent = 'Edit Location';
+            editModalContent.innerHTML = `
+                <div class="form-group">
+                    <label for="edit-location-island">Select Island</label>
+                    <select id="edit-location-island">
+                        <option value="F.Feeali" ${location.island === 'F.Feeali' ? 'selected' : ''}>F.Feeali</option>
+                        <option value="F.Bilehdhoo" ${location.island === 'F.Bilehdhoo' ? 'selected' : ''}>F.Bilehdhoo</option>
+                        <option value="F.Dharaboodhoo" ${location.island === 'F.Dharaboodhoo' ? 'selected' : ''}>F.Dharaboodhoo</option>
+                        <option value="F.Magoodhoo" ${location.island === 'F.Magoodhoo' ? 'selected' : ''}>F.Magoodhoo</option>
+                        <option value="F.Nilandhoo" ${location.island === 'F.Nilandhoo' ? 'selected' : ''}>F.Nilandhoo</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-location-name">Location Name</label>
+                    <input type="text" id="edit-location-name" value="${escapeHtml(location.locationName || '')}" placeholder="Enter location name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-location-remarks">Remarks Message</label>
+                    <textarea id="edit-location-remarks" placeholder="Enter remarks about this location...">${escapeHtml(location.remarks || '')}</textarea>
+                </div>
+            `;
+            
+            showModal(editDataModal);
+        }
+        
+        // Delete location function
+        function deleteLocation(locationId) {
+            if (!isAdmin) {
+                showToast('Only av_5637 can delete locations');
+                return;
+            }
+            
+            currentDeleteItem = locationId;
+            currentDataType = 'location';
+            
+            const location = locationLogs.find(l => l.id === locationId);
+            const island = location ? location.island : 'this location';
+            
+            deleteMessage.textContent = `Are you sure you want to delete ${island} location?`;
+            showModal(deleteModal);
+        }
+        
+        // Copy text to clipboard
+        function copyText(text, label = 'Text') {
+            if (!text || text.trim() === '') {
+                showToast('No text to copy');
+                return;
+            }
+            
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(`"${label}" copied to clipboard!`);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                // Fallback method
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showToast(`"${label}" copied to clipboard!`);
+                } catch (err) {
+                    console.error('Fallback copy failed:', err);
+                    showToast('Failed to copy text');
+                }
+                document.body.removeChild(textArea);
+            });
+        }
+        
+        // Render task logs with separate copy sections
+        function renderTaskLogs() {
+            const filterIsland = taskFilterIsland.value;
+            const filteredTasks = filterIsland ? 
+                taskLogs.filter(task => task.island === filterIsland) : 
+                taskLogs;
+            
+            taskTotalCount.textContent = `Total Tasks: ${taskLogs.length}`;
+            taskFilteredCount.textContent = `Filtered: ${filteredTasks.length}`;
+            
+            if (filteredTasks.length === 0) {
+                taskLogContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-tasks"></i>
+                        <p>No tasks found. ${filterIsland ? 'Try changing the filter.' : 'Create your first task!'}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            taskLogContainer.innerHTML = filteredTasks.map(log => {
+                const timestamp = new Date(log.timestamp).toLocaleString();
+                const hasEnglish = log.messageEn && log.messageEn.trim() !== '';
+                const hasDhivehi = log.messageDv && log.messageDv.trim() !== '';
+                
+                let messagesHtml = '';
+                
+                if (hasEnglish || hasDhivehi) {
+                    messagesHtml = `
+                        <div class="separate-copy-section">
+                            <div class="copy-title">
+                                <i class="fas fa-copy"></i> Copy Messages Separately
+                            </div>
+                            ${hasEnglish ? `
+                                <div class="copy-item english-message-item">
+                                    <div class="message-type">
+                                        <i class="fas fa-flag-usa"></i> English Message
+                                    </div>
+                                    <div class="copy-content">
+                                        ${escapeHtml(log.messageEn)}
+                                    </div>
+                                    <button class="copy-icon" onclick="copyText('${escapeHtml(log.messageEn)}', 'English Task Message')" title="Copy English Message">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            ` : ''}
+                            ${hasDhivehi ? `
+                                <div class="copy-item dhivehi-message-item">
+                                    <div class="message-type">
+                                        <i class="fas fa-language"></i> Dhivehi Message
+                                    </div>
+                                    <div class="copy-content dhivehi-text">
+                                        ${escapeHtml(log.messageDv)}
+                                    </div>
+                                    <button class="copy-icon" onclick="copyText('${escapeHtml(log.messageDv)}', 'Dhivehi Task Message')" title="Copy Dhivehi Message">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            ` : ''}
+                            ${!hasEnglish && !hasDhivehi ? `
+                                <div class="empty-message">
+                                    <i class="fas fa-exclamation-circle"></i> No message content
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }
+                
+                return `
+                    <div class="log-item">
+                        ${isAdmin ? `
+                            <div class="data-actions">
+                                <div class="edit-data-btn" onclick="editTask('${escapeHtml(log.id)}')" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </div>
+                                <div class="delete-data-btn" onclick="deleteTask('${escapeHtml(log.id)}')" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </div>
+                            </div>
+                        ` : ''}
+                        <div class="log-header">
+                            <span class="island-name">${escapeHtml(log.island)}</span>
+                            <span class="timestamp">${timestamp}</span>
+                        </div>
+                        <div class="service-number">Service Number: ${escapeHtml(log.serviceNumber)}</div>
+                        ${messagesHtml}
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Render operation logs with separate copy sections
+        function renderOperationLogs() {
+            const filterIsland = operationFilterIsland.value;
+            const filteredOperations = filterIsland ? 
+                operationLogs.filter(op => op.island === filterIsland) : 
+                operationLogs;
+            
+            operationTotalCount.textContent = `Total Operations: ${operationLogs.length}`;
+            operationFilteredCount.textContent = `Filtered: ${filteredOperations.length}`;
+            
+            if (filteredOperations.length === 0) {
+                operationLogContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <p>No operations found. ${filterIsland ? 'Try changing the filter.' : 'Create your first operation!'}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            operationLogContainer.innerHTML = filteredOperations.map(log => {
+                const timestamp = new Date(log.timestamp).toLocaleString();
+                const hasEnglish = log.messageEn && log.messageEn.trim() !== '';
+                const hasDhivehi = log.messageDv && log.messageDv.trim() !== '';
+                
+                let messagesHtml = '';
+                
+                if (hasEnglish || hasDhivehi) {
+                    messagesHtml = `
+                        <div class="separate-copy-section">
+                            <div class="copy-title">
+                                <i class="fas fa-copy"></i> Copy Operation Messages Separately
+                            </div>
+                            ${hasEnglish ? `
+                                <div class="copy-item english-message-item">
+                                    <div class="message-type">
+                                        <i class="fas fa-flag-usa"></i> English Operation Message
+                                    </div>
+                                    <div class="copy-content">
+                                        ${escapeHtml(log.messageEn)}
+                                    </div>
+                                    <button class="copy-icon" onclick="copyText('${escapeHtml(log.messageEn)}', 'English Operation Message')" title="Copy English Operation">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            ` : ''}
+                            ${hasDhivehi ? `
+                                <div class="copy-item dhivehi-message-item">
+                                    <div class="message-type">
+                                        <i class="fas fa-language"></i> Dhivehi Operation Message
+                                    </div>
+                                    <div class="copy-content dhivehi-text">
+                                        ${escapeHtml(log.messageDv)}
+                                    </div>
+                                    <button class="copy-icon" onclick="copyText('${escapeHtml(log.messageDv)}', 'Dhivehi Operation Message')" title="Copy Dhivehi Operation">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            ` : ''}
+                            ${!hasEnglish && !hasDhivehi ? `
+                                <div class="empty-message">
+                                    <i class="fas fa-exclamation-circle"></i> No operation message
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }
+                
+                return `
+                    <div class="log-item">
+                        ${isAdmin ? `
+                            <div class="data-actions">
+                                <div class="edit-data-btn" onclick="editOperation('${escapeHtml(log.id)}')" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </div>
+                                <div class="delete-data-btn" onclick="deleteOperation('${escapeHtml(log.id)}')" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </div>
+                            </div>
+                        ` : ''}
+                        <div class="log-header">
+                            <span class="island-name">${escapeHtml(log.island)}</span>
+                            <span class="timestamp">${timestamp}</span>
+                        </div>
+                        <div class="service-number">Service Number: ${escapeHtml(log.serviceNumber)}</div>
+                        ${messagesHtml}
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Render location logs with separate copy sections
+        function renderLocationLogs() {
+            const filterIsland = locationFilterIsland.value;
+            const filteredLocations = filterIsland ? 
+                locationLogs.filter(loc => loc.island === filterIsland) : 
+                locationLogs;
+            
+            locationTotalCount.textContent = `Total Locations: ${locationLogs.length}`;
+            locationFilteredCount.textContent = `Filtered: ${filteredLocations.length}`;
+            
+            if (filteredLocations.length === 0) {
+                locationLogContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <p>No locations found. ${filterIsland ? 'Try changing the filter.' : 'Create your first location!'}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            locationLogContainer.innerHTML = filteredLocations.map(log => {
+                const timestamp = new Date(log.timestamp).toLocaleString();
+                
+                return `
+                    <div class="log-item">
+                        ${isAdmin ? `
+                            <div class="data-actions">
+                                <div class="edit-data-btn" onclick="editLocation('${escapeHtml(log.id)}')" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </div>
+                                <div class="delete-data-btn" onclick="deleteLocation('${escapeHtml(log.id)}')" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </div>
+                            </div>
+                        ` : ''}
+                        <div class="log-header">
+                            <span class="island-name">${escapeHtml(log.island)}</span>
+                            <span class="timestamp">${timestamp}</span>
+                        </div>
+                        
+                        <div class="separate-copy-section">
+                            <div class="copy-title">
+                                <i class="fas fa-copy"></i> Copy Location Details Separately
+                            </div>
+                            
+                            <div class="copy-item location-name-item">
+                                <div class="message-type">
+                                    <i class="fas fa-map-marker-alt"></i> Location Name
+                                </div>
+                                <div class="copy-content">
+                                    ${escapeHtml(log.locationName)}
+                                </div>
+                                <button class="copy-icon" onclick="copyText('${escapeHtml(log.locationName)}', 'Location Name')" title="Copy Location Name">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="copy-item remarks-item">
+                                <div class="message-type">
+                                    <i class="fas fa-comment"></i> Remarks
+                                </div>
+                                <div class="copy-content">
+                                    ${escapeHtml(log.remarks)}
+                                </div>
+                                <button class="copy-icon" onclick="copyText('${escapeHtml(log.remarks)}', 'Location Remarks')" title="Copy Remarks">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Initialize the application when DOM is loaded
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
