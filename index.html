@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Island Task & Operation Log</title>
+    
+    <!-- Firebase SDK - USING COMPATIBLE VERSION -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 10px;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #1a73e8, #0d47a1);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            text-align: center;
+        }
+        
+        .tabs {
+            display: flex;
+            background-color: white;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background-color: #f8f9fa;
+            border: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            background-color: #1a73e8;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            background-color: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        select, textarea, input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: #f8f9fa;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .language-tabs {
+            display: flex;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .language-tab {
+            padding: 8px 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: #666;
+        }
+        
+        .language-tab.active {
+            color: #1a73e8;
+            border-bottom: 2px solid #1a73e8;
+        }
+        
+        .message-container {
+            display: none;
+        }
+        
+        .message-container.active {
+            display: block;
+        }
+        
+        /* Dhivehi Faruma Font Styles */
+        .dhivehi-text {
+            font-family: 'Faruma', 'MV Typewriter', 'Mv Waheed', 'Mv Iyyu Nala', sans-serif;
+            direction: rtl;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        
+        .dhivehi-input {
+            font-family: 'Faruma', 'MV Typewriter', 'Mv Waheed', 'Mv Iyyu Nala', sans-serif;
+            direction: rtl;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            text-align: right;
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #0d47a1;
+        }
+        
+        .filter-section {
+            margin: 15px 0;
+            padding: 12px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .filter-select {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background-color: white;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .log-container {
+            margin-top: 15px;
+        }
+        
+        .log-item {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid #1a73e8;
+            position: relative;
+        }
+        
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .island-name {
+            font-weight: 600;
+            color: #1a73e8;
+        }
+        
+        .timestamp {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .service-number {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .log-message {
+            margin-bottom: 10px;
+            word-break: break-word;
+        }
+        
+        .message-language {
+            font-size: 0.7rem;
+            color: #888;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
+        .log-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .copy-btn {
+            background-color: #34a853;
+            color: white;
+        }
+        
+        .edit-btn {
+            background-color: #fbbc05;
+            color: white;
+        }
+        
+        .delete-btn {
+            background-color: #ea4335;
+            color: white;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            color: #ddd;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1001;
+            display: none;
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.3rem;
+            }
+            
+            .tab {
+                padding: 10px;
+                font-size: 0.8rem;
+            }
+            
+            .log-header {
+                flex-direction: column;
+            }
+            
+            .timestamp {
+                margin-top: 5px;
+            }
+            
+            .filter-group {
+                flex-direction: column;
+            }
+            
+            .dhivehi-text, .dhivehi-input {
+                font-size: 1rem;
+            }
+        }
+    </style>
+    <!-- Dhivehi Faruma Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic&display=swap" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'Faruma';
+            src: local('Faruma'), 
+                 url('https://cdn.jsdelivr.net/gh/aaishath/faruma@main/faruma.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        /* Fallback for Faruma font */
+        .dhivehi-text, .dhivehi-input {
+            font-family: 'Faruma', 'Noto Sans Arabic', 'MV Typewriter', 'Mv Waheed', 'Mv Iyyu Nala', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Island Task & Operation Log System</h1>
+        </header>
+        
+        <div class="tabs">
+            <button class="tab active" data-tab="task-log">Task Log</button>
+            <button class="tab" data-tab="operation-log">Operation Log</button>
+        </div>
+        
+        <div id="task-log" class="tab-content active">
+            <div class="form-group">
+                <label for="task-island-select">Select Island</label>
+                <select id="task-island-select">
+                    <option value="">-- Select an island --</option>
+                    <option value="F.Feeali">F.Feeali</option>
+                    <option value="F.Bilehdhoo">F.Bilehdhoo</option>
+                    <option value="F.Dharaboodhoo">F.Dharaboodhoo</option>
+                    <option value="F.Magoodhoo">F.Magoodhoo</option>
+                    <option value="F.Nilandhoo">F.Nilandhoo</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="task-service-number">Officer Service Number</label>
+                <input type="text" id="task-service-number" placeholder="Enter officer service number">
+            </div>
+            
+            <div class="form-group">
+                <label>Task Message</label>
+                <div class="language-tabs">
+                    <button type="button" class="language-tab active" data-lang="en">English</button>
+                    <button type="button" class="language-tab" data-lang="dv">Dhivehi</button>
+                </div>
+                <div id="task-message-en" class="message-container active">
+                    <textarea id="task-message-en-input" placeholder="Enter task message in English..."></textarea>
+                </div>
+                <div id="task-message-dv" class="message-container">
+                    <textarea id="task-message-dv-input" class="dhivehi-input" placeholder="ޓާސްކް މެސެޖެއް ލިޔޭ..."></textarea>
+                </div>
+            </div>
+            
+            <button id="save-task" class="btn">Save Task</button>
+            
+            <div class="filter-section">
+                <div class="filter-group">
+                    <select id="task-filter-island" class="filter-select">
+                        <option value="">All Islands</option>
+                        <option value="F.Feeali">F.Feeali</option>
+                        <option value="F.Bilehdhoo">F.Bilehdhoo</option>
+                        <option value="F.Dharaboodhoo">F.Dharaboodhoo</option>
+                        <option value="F.Magoodhoo">F.Magoodhoo</option>
+                        <option value="F.Nilandhoo">F.Nilandhoo</option>
+                    </select>
+                </div>
+                <div class="stats">
+                    <span id="task-total-count">Total Tasks: 0</span>
+                    <span id="task-filtered-count">Filtered: 0</span>
+                </div>
+            </div>
+            
+            <div class="log-container" id="task-log-container">
+                <div class="loading">Loading task logs...</div>
+            </div>
+        </div>
+        
+        <div id="operation-log" class="tab-content">
+            <div class="form-group">
+                <label for="operation-island-select">Select Island</label>
+                <select id="operation-island-select">
+                    <option value="">-- Select an island --</option>
+                    <option value="F.Feeali">F.Feeali</option>
+                    <option value="F.Bilehdhoo">F.Bilehdhoo</option>
+                    <option value="F.Dharaboodhoo">F.Dharaboodhoo</option>
+                    <option value="F.Magoodhoo">F.Magoodhoo</option>
+                    <option value="F.Nilandhoo">F.Nilandhoo</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="operation-service-number">Officer Service Number</label>
+                <input type="text" id="operation-service-number" placeholder="Enter officer service number">
+            </div>
+            
+            <div class="form-group">
+                <label>Operation Message</label>
+                <div class="language-tabs">
+                    <button type="button" class="language-tab active" data-lang="en">English</button>
+                    <button type="button" class="language-tab" data-lang="dv">Dhivehi</button>
+                </div>
+                <div id="operation-message-en" class="message-container active">
+                    <textarea id="operation-message-en-input" placeholder="Enter operation message in English..."></textarea>
+                </div>
+                <div id="operation-message-dv" class="message-container">
+                    <textarea id="operation-message-dv-input" class="dhivehi-input" placeholder="އޮޕަރޭޝަން މެސެޖެއް ލިޔޭ..."></textarea>
+                </div>
+            </div>
+            
+            <button id="save-operation" class="btn">Save Operation</button>
+            
+            <div class="filter-section">
+                <div class="filter-group">
+                    <select id="operation-filter-island" class="filter-select">
+                        <option value="">All Islands</option>
+                        <option value="F.Feeali">F.Feeali</option>
+                        <option value="F.Bilehdhoo">F.Bilehdhoo</option>
+                        <option value="F.Dharaboodhoo">F.Dharaboodhoo</option>
+                        <option value="F.Magoodhoo">F.Magoodhoo</option>
+                        <option value="F.Nilandhoo">F.Nilandhoo</option>
+                    </select>
+                </div>
+                <div class="stats">
+                    <span id="operation-total-count">Total Operations: 0</span>
+                    <span id="operation-filtered-count">Filtered: 0</span>
+                </div>
+            </div>
+            
+            <div class="log-container" id="operation-log-container">
+                <div class="loading">Loading operation logs...</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Log Entry</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="edit-island">Island</label>
+                <select id="edit-island">
+                    <option value="F.Feeali">F.Feeali</option>
+                    <option value="F.Bilehdhoo">F.Bilehdhoo</option>
+                    <option value="F.Dharaboodhoo">F.Dharaboodhoo</option>
+                    <option value="F.Magoodhoo">F.Magoodhoo</option>
+                    <option value="F.Nilandhoo">F.Nilandhoo</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="edit-service-number">Officer Service Number</label>
+                <input type="text" id="edit-service-number" placeholder="Enter officer service number">
+            </div>
+            <div class="form-group">
+                <label>Message</label>
+                <div class="language-tabs">
+                    <button type="button" class="language-tab active" data-lang="en">English</button>
+                    <button type="button" class="language-tab" data-lang="dv">Dhivehi</button>
+                </div>
+                <div id="edit-message-en" class="message-container active">
+                    <textarea id="edit-message-en-input"></textarea>
+                </div>
+                <div id="edit-message-dv" class="message-container">
+                    <textarea id="edit-message-dv-input" class="dhivehi-input"></textarea>
+                </div>
+            </div>
+            <button id="update-log" class="btn">Update Log</button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDLFVvp9cgV3TkERps8tRozpexUXyrwNA4",
+            authDomain: "faafu-atoll-statistics.firebaseapp.com",
+            databaseURL: "https://faafu-atoll-statistics-default-rtdb.firebaseio.com",
+            projectId: "faafu-atoll-statistics",
+            storageBucket: "faafu-atoll-statistics.firebasestorage.app",
+            messagingSenderId: "280399317384",
+            appId: "1:280399317384:web:ac6f9b826471077e7a123d",
+            measurementId: "G-VH5GX7C6QC"
+        };
+
+        // DOM Elements
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const taskIslandSelect = document.getElementById('task-island-select');
+        const taskServiceNumber = document.getElementById('task-service-number');
+        const taskMessageEnInput = document.getElementById('task-message-en-input');
+        const taskMessageDvInput = document.getElementById('task-message-dv-input');
+        const saveTaskBtn = document.getElementById('save-task');
+        const taskFilterIsland = document.getElementById('task-filter-island');
+        const taskTotalCount = document.getElementById('task-total-count');
+        const taskFilteredCount = document.getElementById('task-filtered-count');
+        const taskLogContainer = document.getElementById('task-log-container');
+        
+        const operationIslandSelect = document.getElementById('operation-island-select');
+        const operationServiceNumber = document.getElementById('operation-service-number');
+        const operationMessageEnInput = document.getElementById('operation-message-en-input');
+        const operationMessageDvInput = document.getElementById('operation-message-dv-input');
+        const saveOperationBtn = document.getElementById('save-operation');
+        const operationFilterIsland = document.getElementById('operation-filter-island');
+        const operationTotalCount = document.getElementById('operation-total-count');
+        const operationFilteredCount = document.getElementById('operation-filtered-count');
+        const operationLogContainer = document.getElementById('operation-log-container');
+        
+        const editModal = document.getElementById('edit-modal');
+        const closeModalBtn = document.querySelector('.close-btn');
+        const editIsland = document.getElementById('edit-island');
+        const editServiceNumber = document.getElementById('edit-service-number');
+        const editMessageEnInput = document.getElementById('edit-message-en-input');
+        const editMessageDvInput = document.getElementById('edit-message-dv-input');
+        const updateLogBtn = document.getElementById('update-log');
+        const toast = document.getElementById('toast');
+        
+        // Language tabs
+        const languageTabs = document.querySelectorAll('.language-tab');
+        
+        // Firebase variables
+        let database;
+        let taskLogsRef;
+        let operationLogsRef;
+        
+        // Data storage
+        let taskLogs = [];
+        let operationLogs = [];
+        let currentEditId = null;
+        let currentEditType = null;
+
+        // Initialize Firebase - COMPATIBLE VERSION
+        function initializeFirebase() {
+            console.log("Initializing Firebase...");
+            
+            try {
+                // Initialize Firebase
+                firebase.initializeApp(firebaseConfig);
+                console.log("Firebase initialized successfully");
+                
+                // Get database reference
+                database = firebase.database();
+                
+                // Set up references
+                taskLogsRef = database.ref('taskLogs');
+                operationLogsRef = database.ref('operationLogs');
+                
+                // Load data from Firebase
+                loadTaskLogs();
+                loadOperationLogs();
+                
+                console.log("Firebase setup complete");
+                return true;
+                
+            } catch (error) {
+                console.error("Firebase initialization error:", error);
+                alert("Firebase connection failed. Please check console for details.");
+                return false;
+            }
+        }
+        
+        // Load task logs from Firebase
+        function loadTaskLogs() {
+            taskLogsRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                console.log("Task logs received from Firebase:", data);
+                
+                taskLogs = data ? Object.entries(data).map(([key, value]) => ({
+                    id: key,
+                    ...value
+                })) : [];
+                
+                // Sort by timestamp (newest first)
+                taskLogs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                
+                renderTaskLogs();
+            }, (error) => {
+                console.error("Error loading task logs:", error);
+                taskLogContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div>⚠️</div>
+                        <p>Error loading task logs. Please refresh the page.</p>
+                    </div>
+                `;
+            });
+        }
+        
+        // Load operation logs from Firebase
+        function loadOperationLogs() {
+            operationLogsRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                console.log("Operation logs received from Firebase:", data);
+                
+                operationLogs = data ? Object.entries(data).map(([key, value]) => ({
+                    id: key,
+                    ...value
+                })) : [];
+                
+                // Sort by timestamp (newest first)
+                operationLogs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                
+                renderOperationLogs();
+            }, (error) => {
+                console.error("Error loading operation logs:", error);
+                operationLogContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div>⚠️</div>
+                        <p>Error loading operation logs. Please refresh the page.</p>
+                    </div>
+                `;
+            });
+        }
+        
+        // Initialize the app
+        function init() {
+            console.log("Initializing application...");
+            
+            // Initialize Firebase
+            initializeFirebase();
+            
+            // Tab switching
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(tc => tc.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Language tab switching
+            languageTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const container = this.closest('.form-group');
+                    const lang = this.getAttribute('data-lang');
+                    
+                    // Update active tab
+                    container.querySelectorAll('.language-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Update active message container
+                    container.querySelectorAll('.message-container').forEach(mc => mc.classList.remove('active'));
+                    container.querySelector(`.message-container[id$="-${lang}"]`).classList.add('active');
+                });
+            });
+            
+            // Save task
+            saveTaskBtn.addEventListener('click', saveTask);
+            
+            // Save operation
+            saveOperationBtn.addEventListener('click', saveOperation);
+            
+            // Filter events
+            taskFilterIsland.addEventListener('change', renderTaskLogs);
+            operationFilterIsland.addEventListener('change', renderOperationLogs);
+            
+            // Modal events
+            closeModalBtn.addEventListener('click', () => {
+                editModal.style.display = 'none';
+            });
+            
+            updateLogBtn.addEventListener('click', updateLog);
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === editModal) {
+                    editModal.style.display = 'none';
+                }
+            });
+            
+            console.log("Application initialized");
+        }
+        
+        // Show toast notification
+        function showToast(message) {
+            toast.textContent = message;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Save a new task
+        function saveTask() {
+            const island = taskIslandSelect.value;
+            const serviceNumber = taskServiceNumber.value.trim();
+            const messageEn = taskMessageEnInput.value.trim();
+            const messageDv = taskMessageDvInput.value.trim();
+            
+            if (!island || !serviceNumber || (!messageEn && !messageDv)) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            const newTask = {
+                island: island,
+                serviceNumber: serviceNumber,
+                messageEn: messageEn,
+                messageDv: messageDv,
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log("Saving task to Firebase:", newTask);
+            
+            // Save to Firebase
+            taskLogsRef.push(newTask)
+                .then(() => {
+                    console.log("Task saved successfully");
+                    
+                    // Reset form
+                    taskIslandSelect.value = '';
+                    taskServiceNumber.value = '';
+                    taskMessageEnInput.value = '';
+                    taskMessageDvInput.value = '';
+                    
+                    showToast('Task saved successfully!');
+                })
+                .catch((error) => {
+                    console.error('Error saving task:', error);
+                    alert('Error saving task. Please check console for details.');
+                });
+        }
+        
+        // Save a new operation
+        function saveOperation() {
+            const island = operationIslandSelect.value;
+            const serviceNumber = operationServiceNumber.value.trim();
+            const messageEn = operationMessageEnInput.value.trim();
+            const messageDv = operationMessageDvInput.value.trim();
+            
+            if (!island || !serviceNumber || (!messageEn && !messageDv)) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            const newOperation = {
+                island: island,
+                serviceNumber: serviceNumber,
+                messageEn: messageEn,
+                messageDv: messageDv,
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log("Saving operation to Firebase:", newOperation);
+            
+            // Save to Firebase
+            operationLogsRef.push(newOperation)
+                .then(() => {
+                    console.log("Operation saved successfully");
+                    
+                    // Reset form
+                    operationIslandSelect.value = '';
+                    operationServiceNumber.value = '';
+                    operationMessageEnInput.value = '';
+                    operationMessageDvInput.value = '';
+                    
+                    showToast('Operation saved successfully!');
+                })
+                .catch((error) => {
+                    console.error('Error saving operation:', error);
+                    alert('Error saving operation. Please check console for details.');
+                });
+        }
+        
+        // Render task logs
+        function renderTaskLogs() {
+            const filterIsland = taskFilterIsland.value;
+            const filteredTasks = filterIsland ? 
+                taskLogs.filter(task => task.island === filterIsland) : 
+                taskLogs;
+            
+            // Update counts
+            taskTotalCount.textContent = `Total Tasks: ${taskLogs.length}`;
+            taskFilteredCount.textContent = `Filtered: ${filteredTasks.length}`;
+            
+            if (taskLogs.length === 0) {
+                taskLogContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div>📝</div>
+                        <p>No task logs found. ${filterIsland ? 'Try changing the filter.' : 'Create your first task!'}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            if (filteredTasks.length === 0) {
+                taskLogContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div>📝</div>
+                        <p>No tasks found for selected island. Try changing the filter.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            taskLogContainer.innerHTML = filteredTasks.map(log => {
+                const timestamp = new Date(log.timestamp).toLocaleString();
+                let messageHtml = '';
+                if (log.messageEn && log.messageDv) {
+                    messageHtml = `
+                        <div class="log-message">${escapeHtml(log.messageEn)}</div>
+                        <div class="log-message dhivehi-text">${escapeHtml(log.messageDv)}</div>
+                    `;
+                } else if (log.messageEn) {
+                    messageHtml = `<div class="log-message">${escapeHtml(log.messageEn)}</div>`;
+                } else if (log.messageDv) {
+                    messageHtml = `<div class="log-message dhivehi-text">${escapeHtml(log.messageDv)}</div>`;
+                }
+                
+                return `
+                    <div class="log-item">
+                        <div class="log-header">
+                            <span class="island-name">${escapeHtml(log.island)}</span>
+                            <span class="timestamp">${timestamp}</span>
+                        </div>
+                        <div class="service-number">Service Number: ${escapeHtml(log.serviceNumber)}</div>
+                        ${messageHtml}
+                        <div class="log-actions">
+                            <button class="action-btn copy-btn" onclick="copyToClipboard('${escapeHtml(log.messageEn || '')}', '${escapeHtml(log.messageDv || '')}')">Copy</button>
+                            <button class="action-btn edit-btn" onclick="openEditModal('${log.id}', 'task')">Edit</button>
+                            <button class="action-btn delete-btn" onclick="deleteLog('${log.id}', 'task')">Delete</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Render operation logs
+        function renderOperationLogs() {
+            const filterIsland = operationFilterIsland.value;
+            const filteredOperations = filterIsland ? 
+                operationLogs.filter(operation => operation.island === filterIsland) : 
+                operationLogs;
+            
+            // Update counts
+            operationTotalCount.textContent = `Total Operations: ${operationLogs.length}`;
+            operationFilteredCount.textContent = `Filtered: ${filteredOperations.length}`;
+            
+            if (operationLogs.length === 0) {
+                operationLogContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div>🔍</div>
+                        <p>No operation logs found. ${filterIsland ? 'Try changing the filter.' : 'Create your first operation!'}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            if (filteredOperations.length === 0) {
+                operationLogContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div>🔍</div>
+                        <p>No operations found for selected island. Try changing the filter.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            operationLogContainer.innerHTML = filteredOperations.map(log => {
+                const timestamp = new Date(log.timestamp).toLocaleString();
+                let messageHtml = '';
+                if (log.messageEn && log.messageDv) {
+                    messageHtml = `
+                        <div class="log-message">${escapeHtml(log.messageEn)}</div>
+                        <div class="log-message dhivehi-text">${escapeHtml(log.messageDv)}</div>
+                    `;
+                } else if (log.messageEn) {
+                    messageHtml = `<div class="log-message">${escapeHtml(log.messageEn)}</div>`;
+                } else if (log.messageDv) {
+                    messageHtml = `<div class="log-message dhivehi-text">${escapeHtml(log.messageDv)}</div>`;
+                }
+                
+                return `
+                    <div class="log-item">
+                        <div class="log-header">
+                            <span class="island-name">${escapeHtml(log.island)}</span>
+                            <span class="timestamp">${timestamp}</span>
+                        </div>
+                        <div class="service-number">Service Number: ${escapeHtml(log.serviceNumber)}</div>
+                        ${messageHtml}
+                        <div class="log-actions">
+                            <button class="action-btn copy-btn" onclick="copyToClipboard('${escapeHtml(log.messageEn || '')}', '${escapeHtml(log.messageDv || '')}')">Copy</button>
+                            <button class="action-btn edit-btn" onclick="openEditModal('${log.id}', 'operation')">Edit</button>
+                            <button class="action-btn delete-btn" onclick="deleteLog('${log.id}', 'operation')">Delete</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Copy message to clipboard
+        function copyToClipboard(messageEn, messageDv) {
+            let textToCopy = '';
+            
+            if (messageEn && messageDv) {
+                textToCopy = `${messageEn}\n\n${messageDv}`;
+            } else if (messageEn) {
+                textToCopy = messageEn;
+            } else if (messageDv) {
+                textToCopy = messageDv;
+            }
+            
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                showToast('Message copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = textToCopy;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showToast('Message copied to clipboard!');
+            });
+        }
+        
+        // Open edit modal
+        function openEditModal(id, type) {
+            currentEditId = id;
+            currentEditType = type;
+            
+            const logs = type === 'task' ? taskLogs : operationLogs;
+            const log = logs.find(l => l.id === id);
+            
+            if (log) {
+                editIsland.value = log.island;
+                editServiceNumber.value = log.serviceNumber;
+                editMessageEnInput.value = log.messageEn || '';
+                editMessageDvInput.value = log.messageDv || '';
+                editModal.style.display = 'flex';
+            }
+        }
+        
+        // Update log entry
+        function updateLog() {
+            const island = editIsland.value;
+            const serviceNumber = editServiceNumber.value.trim();
+            const messageEn = editMessageEnInput.value.trim();
+            const messageDv = editMessageDvInput.value.trim();
+            
+            if (!island || !serviceNumber || (!messageEn && !messageDv)) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            const updatedLog = {
+                island: island,
+                serviceNumber: serviceNumber,
+                messageEn: messageEn,
+                messageDv: messageDv,
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log("Updating log:", currentEditId, updatedLog);
+            
+            try {
+                if (currentEditType === 'task') {
+                    // Update in Firebase
+                    taskLogsRef.child(currentEditId).update(updatedLog)
+                        .then(() => {
+                            editModal.style.display = 'none';
+                            showToast('Log updated successfully!');
+                        })
+                        .catch(error => {
+                            console.error('Error updating log:', error);
+                            alert('Error updating log. Please check console for details.');
+                        });
+                } else {
+                    // Update in Firebase
+                    operationLogsRef.child(currentEditId).update(updatedLog)
+                        .then(() => {
+                            editModal.style.display = 'none';
+                            showToast('Log updated successfully!');
+                        })
+                        .catch(error => {
+                            console.error('Error updating log:', error);
+                            alert('Error updating log. Please check console for details.');
+                        });
+                }
+                
+            } catch (error) {
+                console.error('Error updating log:', error);
+                alert('Error updating log. Please check console for details.');
+            }
+        }
+        
+        // Delete log entry
+        function deleteLog(id, type) {
+            if (!confirm('Are you sure you want to delete this log entry?')) {
+                return;
+            }
+            
+            console.log("Deleting log:", id, type);
+            
+            try {
+                if (type === 'task') {
+                    // Delete from Firebase
+                    taskLogsRef.child(id).remove()
+                        .then(() => {
+                            showToast('Log deleted successfully!');
+                        })
+                        .catch(error => {
+                            console.error('Error deleting log:', error);
+                            alert('Error deleting log. Please check console for details.');
+                        });
+                } else {
+                    // Delete from Firebase
+                    operationLogsRef.child(id).remove()
+                        .then(() => {
+                            showToast('Log deleted successfully!');
+                        })
+                        .catch(error => {
+                            console.error('Error deleting log:', error);
+                            alert('Error deleting log. Please check console for details.');
+                        });
+                }
+                
+            } catch (error) {
+                console.error('Error deleting log:', error);
+                alert('Error deleting log. Please check console for details.');
+            }
+        }
+        
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
