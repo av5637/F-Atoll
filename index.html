@@ -3,11 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Island Task & Operation Log</title>
+    <title>Island Task, Operation & Location Log</title>
     
     <!-- Firebase SDK - USING COMPATIBLE VERSION -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         * {
@@ -17,89 +20,287 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
+        :root {
+            --primary-color: #1a73e8;
+            --primary-dark: #0d47a1;
+            --secondary-color: #34a853;
+            --warning-color: #fbbc05;
+            --danger-color: #ea4335;
+            --text-color: #333;
+            --text-light: #666;
+            --bg-color: #f0f2f5;
+            --card-bg: white;
+            --border-color: #ddd;
+            --sidebar-bg: #1e293b;
+            --sidebar-text: #e2e8f0;
+            --sidebar-hover: #334155;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+            --sidebar-width: 250px;
+        }
+        
+        .dark-mode {
+            --primary-color: #3b82f6;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --text-color: #e2e8f0;
+            --text-light: #94a3b8;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --border-color: #334155;
+            --sidebar-bg: #0f172a;
+            --sidebar-text: #cbd5e1;
+            --sidebar-hover: #334155;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        
         body {
-            background-color: #f0f2f5;
-            color: #333;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             line-height: 1.6;
-            padding: 10px;
-        }
-        
-        .container {
-            max-width: 100%;
-            margin: 0 auto;
-        }
-        
-        header {
-            background: linear-gradient(135deg, #1a73e8, #0d47a1);
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        h1 {
-            font-size: 1.5rem;
-            text-align: center;
-        }
-        
-        .tabs {
+            transition: var(--transition);
             display: flex;
-            background-color: white;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            min-height: 100vh;
+            overflow-x: hidden;
         }
         
-        .tab {
-            flex: 1;
-            padding: 12px;
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            transform: translateX(0);
+        }
+        
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             text-align: center;
-            background-color: #f8f9fa;
-            border: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s;
         }
         
-        .tab.active {
-            background-color: #1a73e8;
+        .sidebar-header h2 {
+            font-size: 1.2rem;
+            color: white;
+            margin-bottom: 5px;
+        }
+        
+        .sidebar-header p {
+            font-size: 0.8rem;
+            color: var(--sidebar-text);
+            opacity: 0.8;
+        }
+        
+        .nav-menu {
+            flex: 1;
+            padding: 20px 0;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            transition: var(--transition);
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+        
+        .nav-item:hover {
+            background-color: var(--sidebar-hover);
+            color: white;
+            padding-left: 25px;
+        }
+        
+        .nav-item.active {
+            background-color: rgba(59, 130, 246, 0.2);
+            border-left: 3px solid var(--primary-color);
             color: white;
         }
         
+        .nav-item i {
+            margin-right: 12px;
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+        
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--sidebar-text);
+        }
+        
+        .sidebar-footer .developer {
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        /* Sidebar Overlay for Mobile */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .sidebar-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+            transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease;
+            width: calc(100% - var(--sidebar-width));
+        }
+        
+        .sidebar.collapsed + .main-content {
+            margin-left: 0;
+            width: 100%;
+        }
+        
+        /* Header */
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .header-left h1 {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+        }
+        
+        .header-left p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        /* Dark Mode Toggle */
+        .dark-mode-toggle {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            background-color: var(--card-bg);
+            padding: 8px 15px;
+            border-radius: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+        }
+        
+        .dark-mode-toggle:hover {
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .dark-mode-toggle i {
+            margin-right: 8px;
+            font-size: 1.1rem;
+        }
+        
+        /* Hamburger Menu (for mobile) */
+        .hamburger-menu {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-color);
+            background: var(--card-bg);
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+        }
+        
+        .hamburger-menu:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        /* Tab Content */
         .tab-content {
             display: none;
-            background-color: white;
+            background-color: var(--card-bg);
             border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            animation: fadeIn 0.5s ease;
         }
         
         .tab-content.active {
             display: block;
         }
         
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             font-weight: 600;
-            color: #555;
+            color: var(--text-color);
         }
         
         select, textarea, input {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             font-size: 1rem;
-            background-color: #f8f9fa;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            transition: var(--transition);
+        }
+        
+        select:focus, textarea:focus, input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         }
         
         textarea {
@@ -110,21 +311,22 @@
         .language-tabs {
             display: flex;
             margin-bottom: 8px;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid var(--border-color);
         }
         
         .language-tab {
-            padding: 8px 12px;
+            padding: 8px 15px;
             background: none;
             border: none;
             cursor: pointer;
             font-weight: 500;
-            color: #666;
+            color: var(--text-light);
+            transition: var(--transition);
         }
         
         .language-tab.active {
-            color: #1a73e8;
-            border-bottom: 2px solid #1a73e8;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
         }
         
         .message-container {
@@ -137,14 +339,14 @@
         
         /* Dhivehi Faruma Font Styles */
         .dhivehi-text {
-            font-family: 'Faruma', 'MV Typewriter', 'Mv Waheed', 'Mv Iyyu Nala', sans-serif;
+            font-family: 'Faruma', 'Noto Sans Arabic', 'MV Typewriter', 'Mv Waheed', 'Mv Iyyu Nala', sans-serif;
             direction: rtl;
             font-size: 1.1rem;
             line-height: 1.8;
         }
         
         .dhivehi-input {
-            font-family: 'Faruma', 'MV Typewriter', 'Mv Waheed', 'Mv Iyyu Nala', sans-serif;
+            font-family: 'Faruma', 'Noto Sans Arabic', 'MV Typewriter', 'Mv Waheed', 'Mv Iyyu Nala', sans-serif;
             direction: rtl;
             font-size: 1.1rem;
             line-height: 1.8;
@@ -155,24 +357,26 @@
             display: block;
             width: 100%;
             padding: 12px;
-            background-color: #1a73e8;
+            background-color: var(--primary-color);
             color: white;
             border: none;
             border-radius: 8px;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: var(--transition);
         }
         
         .btn:hover {
-            background-color: #0d47a1;
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
         
         .filter-section {
-            margin: 15px 0;
-            padding: 12px;
-            background-color: #f8f9fa;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: var(--bg-color);
             border-radius: 8px;
         }
         
@@ -184,10 +388,11 @@
         
         .filter-select {
             flex: 1;
-            padding: 8px;
-            border: 1px solid #ddd;
+            padding: 10px;
+            border: 1px solid var(--border-color);
             border-radius: 6px;
-            background-color: white;
+            background-color: var(--card-bg);
+            color: var(--text-color);
         }
         
         .stats {
@@ -195,42 +400,63 @@
             justify-content: space-between;
             margin-top: 10px;
             font-size: 0.9rem;
-            color: #666;
+            color: var(--text-light);
         }
         
         .log-container {
-            margin-top: 15px;
+            margin-top: 20px;
         }
         
         .log-item {
-            background-color: #f8f9fa;
+            background-color: var(--card-bg);
             border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 10px;
-            border-left: 4px solid #1a73e8;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary-color);
             position: relative;
+            transition: var(--transition);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .log-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .location-log-item {
+            border-left-color: var(--secondary-color);
+        }
+        
+        .operation-log-item {
+            border-left-color: var(--warning-color);
         }
         
         .log-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
         
         .island-name {
             font-weight: 600;
-            color: #1a73e8;
+            color: var(--primary-color);
+        }
+        
+        .location-name {
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-bottom: 5px;
         }
         
         .timestamp {
-            font-size: 0.8rem;
-            color: #666;
+            font-size: 0.85rem;
+            color: var(--text-light);
         }
         
         .service-number {
-            font-size: 0.8rem;
-            color: #666;
-            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 8px;
         }
         
         .log-message {
@@ -239,8 +465,8 @@
         }
         
         .message-language {
-            font-size: 0.7rem;
-            color: #888;
+            font-size: 0.75rem;
+            color: var(--text-light);
             margin-top: 5px;
             font-style: italic;
         }
@@ -248,50 +474,71 @@
         .log-actions {
             display: flex;
             gap: 10px;
+            margin-top: 15px;
         }
         
         .action-btn {
-            padding: 6px 12px;
+            padding: 8px 15px;
             border: none;
-            border-radius: 4px;
-            font-size: 0.8rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
         
         .copy-btn {
-            background-color: #34a853;
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .copy-location-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .copy-remarks-btn {
+            background-color: var(--danger-color);
             color: white;
         }
         
         .edit-btn {
-            background-color: #fbbc05;
+            background-color: var(--warning-color);
             color: white;
         }
         
         .delete-btn {
-            background-color: #ea4335;
+            background-color: var(--danger-color);
             color: white;
+        }
+        
+        .action-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
         }
         
         .empty-state {
             text-align: center;
-            padding: 30px;
-            color: #666;
+            padding: 40px;
+            color: var(--text-light);
         }
         
         .empty-state i {
             font-size: 3rem;
-            margin-bottom: 10px;
-            color: #ddd;
+            margin-bottom: 15px;
+            color: var(--border-color);
         }
         
         .loading {
             text-align: center;
-            padding: 20px;
-            color: #666;
+            padding: 30px;
+            color: var(--text-light);
         }
         
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -303,15 +550,27 @@
             z-index: 1000;
             align-items: center;
             justify-content: center;
+            animation: fadeInModal 0.3s ease;
+        }
+        
+        @keyframes fadeInModal {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
         .modal-content {
-            background-color: white;
+            background-color: var(--card-bg);
             width: 90%;
             max-width: 500px;
             border-radius: 10px;
             padding: 20px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            animation: slideInModal 0.3s ease;
+        }
+        
+        @keyframes slideInModal {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
         
         .modal-header {
@@ -321,36 +580,93 @@
             margin-bottom: 15px;
         }
         
+        .modal-header h2 {
+            color: var(--text-color);
+        }
+        
         .close-btn {
             background: none;
             border: none;
             font-size: 1.5rem;
             cursor: pointer;
-            color: #666;
+            color: var(--text-light);
+            transition: var(--transition);
         }
         
+        .close-btn:hover {
+            color: var(--danger-color);
+            transform: scale(1.1);
+        }
+        
+        /* Toast Notification */
         .toast {
             position: fixed;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background-color: #333;
-            color: white;
+            background-color: var(--card-bg);
+            color: var(--text-color);
             padding: 12px 20px;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             z-index: 1001;
             display: none;
+            border-left: 4px solid var(--primary-color);
+            animation: slideInToast 0.3s ease;
         }
         
-        @media (max-width: 480px) {
-            h1 {
-                font-size: 1.3rem;
+        @keyframes slideInToast {
+            from { transform: translateX(-50%) translateY(20px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+        
+        /* Footer */
+        .main-footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            color: var(--text-light);
+            border-top: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+        
+        .main-footer .developer {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-top: 5px;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
             }
             
-            .tab {
-                padding: 10px;
-                font-size: 0.8rem;
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 15px;
+            }
+            
+            .hamburger-menu {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .header-left h1 {
+                font-size: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px;
             }
             
             .log-header {
@@ -365,8 +681,44 @@
                 flex-direction: column;
             }
             
+            .log-actions {
+                flex-wrap: wrap;
+            }
+            
             .dhivehi-text, .dhivehi-input {
                 font-size: 1rem;
+            }
+            
+            .header-right {
+                flex-wrap: wrap;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header-right {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .dark-mode-toggle {
+                padding: 6px 12px;
+                font-size: 0.9rem;
+            }
+            
+            .action-btn {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+            }
+            
+            .tab-content {
+                padding: 15px;
+            }
+            
+            .main-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
             }
         }
     </style>
@@ -388,16 +740,64 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Island Task & Operation Log System</h1>
-        </header>
-        
-        <div class="tabs">
-            <button class="tab active" data-tab="task-log">Task Log</button>
-            <button class="tab" data-tab="operation-log">Operation Log</button>
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    
+    <!-- Sidebar Navigation -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>Island Log System</h2>
+            <p>Faafu Atoll</p>
         </div>
         
+        <div class="nav-menu">
+            <a href="#" class="nav-item active" data-tab="task-log">
+                <i class="fas fa-tasks"></i>
+                <span>Task Log</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="operation-log">
+                <i class="fas fa-search"></i>
+                <span>Operation Log</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="location-log">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Location Log</span>
+            </a>
+            <a href="#" class="nav-item" id="dark-mode-toggle-sidebar">
+                <i class="fas fa-moon"></i>
+                <span>Dark Mode</span>
+            </a>
+        </div>
+        
+        <div class="sidebar-footer">
+            <div class="developer">Developer: Ahmed Vaseem</div>
+            <p>Faafu Atoll Police</p>
+            <p>Version 2.0</p>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="main-header">
+            <div class="header-left">
+                <h1>F. Atoll Island Task, Operation & Location Log System</h1>
+                <p>Track and manage all island activities in one place</p>
+            </div>
+            
+            <div class="header-right">
+                <div class="dark-mode-toggle" id="dark-mode-toggle">
+                    <i class="fas fa-moon"></i>
+                    <span>Dark Mode</span>
+                </div>
+                
+                <div class="hamburger-menu" id="hamburger-menu">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab Contents -->
         <div id="task-log" class="tab-content active">
             <div class="form-group">
                 <label for="task-island-select">Select Island</label>
@@ -509,18 +909,12 @@
                 <div class="loading">Loading operation logs...</div>
             </div>
         </div>
-    </div>
-    
-    <!-- Edit Modal -->
-    <div id="edit-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Edit Log Entry</h2>
-                <button class="close-btn">&times;</button>
-            </div>
+        
+        <div id="location-log" class="tab-content">
             <div class="form-group">
-                <label for="edit-island">Island</label>
-                <select id="edit-island">
+                <label for="location-island-select">Select Island</label>
+                <select id="location-island-select">
+                    <option value="">-- Select an island --</option>
                     <option value="F.Feeali">F.Feeali</option>
                     <option value="F.Bilehdhoo">F.Bilehdhoo</option>
                     <option value="F.Dharaboodhoo">F.Dharaboodhoo</option>
@@ -528,21 +922,105 @@
                     <option value="F.Nilandhoo">F.Nilandhoo</option>
                 </select>
             </div>
+            
             <div class="form-group">
-                <label for="edit-service-number">Officer Service Number</label>
-                <input type="text" id="edit-service-number" placeholder="Enter officer service number">
+                <label for="location-name">Location Name</label>
+                <input type="text" id="location-name" placeholder="Enter location name (e.g., Police Station, Harbor, Health Center)">
             </div>
+            
             <div class="form-group">
-                <label>Message</label>
-                <div class="language-tabs">
-                    <button type="button" class="language-tab active" data-lang="en">English</button>
-                    <button type="button" class="language-tab" data-lang="dv">Dhivehi</button>
+                <label for="location-remarks">Remarks Message</label>
+                <textarea id="location-remarks" placeholder="Enter remarks about this location..."></textarea>
+            </div>
+            
+            <button id="save-location" class="btn">Save Location</button>
+            
+            <div class="filter-section">
+                <div class="filter-group">
+                    <select id="location-filter-island" class="filter-select">
+                        <option value="">All Islands</option>
+                        <option value="F.Feeali">F.Feeali</option>
+                        <option value="F.Bilehdhoo">F.Bilehdhoo</option>
+                        <option value="F.Dharaboodhoo">F.Dharaboodhoo</option>
+                        <option value="F.Magoodhoo">F.Magoodhoo</option>
+                        <option value="F.Nilandhoo">F.Nilandhoo</option>
+                    </select>
                 </div>
-                <div id="edit-message-en" class="message-container active">
-                    <textarea id="edit-message-en-input"></textarea>
+                <div class="stats">
+                    <span id="location-total-count">Total Locations: 0</span>
+                    <span id="location-filtered-count">Filtered: 0</span>
                 </div>
-                <div id="edit-message-dv" class="message-container">
-                    <textarea id="edit-message-dv-input" class="dhivehi-input"></textarea>
+            </div>
+            
+            <div class="log-container" id="location-log-container">
+                <div class="loading">Loading location logs...</div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="main-footer">
+            <p>Faafu Atoll Island Log System &copy; <span id="current-year"></span></p>
+            <p class="developer">Developed by: Ahmed Vaseem</p>
+            <p>For official use only</p>
+        </footer>
+    </div>
+    
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="edit-modal-title">Edit Log Entry</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div id="edit-location-fields">
+                <!-- Location edit fields will be shown here -->
+                <div class="form-group">
+                    <label for="edit-island">Island</label>
+                    <select id="edit-island">
+                        <option value="F.Feeali">F.Feeali</option>
+                        <option value="F.Bilehdhoo">F.Bilehdhoo</option>
+                        <option value="F.Dharaboodhoo">F.Dharaboodhoo</option>
+                        <option value="F.Magoodhoo">F.Magoodhoo</option>
+                        <option value="F.Nilandhoo">F.Nilandhoo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-location-name">Location Name</label>
+                    <input type="text" id="edit-location-name" placeholder="Enter location name">
+                </div>
+                <div class="form-group">
+                    <label for="edit-location-remarks">Remarks</label>
+                    <textarea id="edit-location-remarks"></textarea>
+                </div>
+            </div>
+            <div id="edit-task-fields">
+                <!-- Task edit fields will be shown here -->
+                <div class="form-group">
+                    <label for="edit-island-task">Island</label>
+                    <select id="edit-island-task">
+                        <option value="F.Feeali">F.Feeali</option>
+                        <option value="F.Bilehdhoo">F.Bilehdhoo</option>
+                        <option value="F.Dharaboodhoo">F.Dharaboodhoo</option>
+                        <option value="F.Magoodhoo">F.Magoodhoo</option>
+                        <option value="F.Nilandhoo">F.Nilandhoo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-service-number-task">Officer Service Number</label>
+                    <input type="text" id="edit-service-number-task" placeholder="Enter officer service number">
+                </div>
+                <div class="form-group">
+                    <label>Message</label>
+                    <div class="language-tabs">
+                        <button type="button" class="language-tab active" data-lang="en">English</button>
+                        <button type="button" class="language-tab" data-lang="dv">Dhivehi</button>
+                    </div>
+                    <div id="edit-message-en" class="message-container active">
+                        <textarea id="edit-message-en-input"></textarea>
+                    </div>
+                    <div id="edit-message-dv" class="message-container">
+                        <textarea id="edit-message-dv-input" class="dhivehi-input"></textarea>
+                    </div>
                 </div>
             </div>
             <button id="update-log" class="btn">Update Log</button>
@@ -566,8 +1044,16 @@
         };
 
         // DOM Elements
-        const tabs = document.querySelectorAll('.tab');
+        const sidebar = document.getElementById('sidebar');
+        const navItems = document.querySelectorAll('.nav-item');
         const tabContents = document.querySelectorAll('.tab-content');
+        const hamburgerMenu = document.getElementById('hamburger-menu');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        const darkModeToggleSidebar = document.getElementById('dark-mode-toggle-sidebar');
+        const currentYearSpan = document.getElementById('current-year');
+        
+        // Task elements
         const taskIslandSelect = document.getElementById('task-island-select');
         const taskServiceNumber = document.getElementById('task-service-number');
         const taskMessageEnInput = document.getElementById('task-message-en-input');
@@ -578,6 +1064,7 @@
         const taskFilteredCount = document.getElementById('task-filtered-count');
         const taskLogContainer = document.getElementById('task-log-container');
         
+        // Operation elements
         const operationIslandSelect = document.getElementById('operation-island-select');
         const operationServiceNumber = document.getElementById('operation-service-number');
         const operationMessageEnInput = document.getElementById('operation-message-en-input');
@@ -588,10 +1075,27 @@
         const operationFilteredCount = document.getElementById('operation-filtered-count');
         const operationLogContainer = document.getElementById('operation-log-container');
         
+        // Location elements
+        const locationIslandSelect = document.getElementById('location-island-select');
+        const locationNameInput = document.getElementById('location-name');
+        const locationRemarksInput = document.getElementById('location-remarks');
+        const saveLocationBtn = document.getElementById('save-location');
+        const locationFilterIsland = document.getElementById('location-filter-island');
+        const locationTotalCount = document.getElementById('location-total-count');
+        const locationFilteredCount = document.getElementById('location-filtered-count');
+        const locationLogContainer = document.getElementById('location-log-container');
+        
+        // Modal elements
         const editModal = document.getElementById('edit-modal');
         const closeModalBtn = document.querySelector('.close-btn');
+        const editModalTitle = document.getElementById('edit-modal-title');
+        const editLocationFields = document.getElementById('edit-location-fields');
+        const editTaskFields = document.getElementById('edit-task-fields');
         const editIsland = document.getElementById('edit-island');
-        const editServiceNumber = document.getElementById('edit-service-number');
+        const editLocationName = document.getElementById('edit-location-name');
+        const editLocationRemarks = document.getElementById('edit-location-remarks');
+        const editIslandTask = document.getElementById('edit-island-task');
+        const editServiceNumberTask = document.getElementById('edit-service-number-task');
         const editMessageEnInput = document.getElementById('edit-message-en-input');
         const editMessageDvInput = document.getElementById('edit-message-dv-input');
         const updateLogBtn = document.getElementById('update-log');
@@ -604,12 +1108,44 @@
         let database;
         let taskLogsRef;
         let operationLogsRef;
+        let locationLogsRef;
         
         // Data storage
         let taskLogs = [];
         let operationLogs = [];
+        let locationLogs = [];
         let currentEditId = null;
         let currentEditType = null;
+        let isMobile = false;
+
+        // Check if mobile
+        function checkMobile() {
+            isMobile = window.innerWidth <= 992;
+            if (isMobile) {
+                sidebar.classList.add('collapsed');
+            } else {
+                sidebar.classList.remove('collapsed');
+                sidebarOverlay.classList.remove('active');
+            }
+        }
+
+        // Toggle sidebar
+        function toggleSidebar() {
+            if (isMobile) {
+                sidebar.classList.toggle('active');
+                sidebarOverlay.classList.toggle('active');
+            } else {
+                sidebar.classList.toggle('collapsed');
+            }
+        }
+
+        // Close sidebar on mobile
+        function closeSidebarMobile() {
+            if (isMobile) {
+                sidebar.classList.remove('active');
+                sidebarOverlay.classList.remove('active');
+            }
+        }
 
         // Initialize Firebase - COMPATIBLE VERSION
         function initializeFirebase() {
@@ -626,10 +1162,12 @@
                 // Set up references
                 taskLogsRef = database.ref('taskLogs');
                 operationLogsRef = database.ref('operationLogs');
+                locationLogsRef = database.ref('locationLogs');
                 
                 // Load data from Firebase
                 loadTaskLogs();
                 loadOperationLogs();
+                loadLocationLogs();
                 
                 console.log("Firebase setup complete");
                 return true;
@@ -660,7 +1198,7 @@
                 console.error("Error loading task logs:", error);
                 taskLogContainer.innerHTML = `
                     <div class="empty-state">
-                        <div>⚠️</div>
+                        <i class="fas fa-exclamation-triangle"></i>
                         <p>Error loading task logs. Please refresh the page.</p>
                     </div>
                 `;
@@ -686,8 +1224,34 @@
                 console.error("Error loading operation logs:", error);
                 operationLogContainer.innerHTML = `
                     <div class="empty-state">
-                        <div>⚠️</div>
+                        <i class="fas fa-exclamation-triangle"></i>
                         <p>Error loading operation logs. Please refresh the page.</p>
+                    </div>
+                `;
+            });
+        }
+        
+        // Load location logs from Firebase
+        function loadLocationLogs() {
+            locationLogsRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                console.log("Location logs received from Firebase:", data);
+                
+                locationLogs = data ? Object.entries(data).map(([key, value]) => ({
+                    id: key,
+                    ...value
+                })) : [];
+                
+                // Sort by timestamp (newest first)
+                locationLogs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                
+                renderLocationLogs();
+            }, (error) => {
+                console.error("Error loading location logs:", error);
+                locationLogContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Error loading location logs. Please refresh the page.</p>
                     </div>
                 `;
             });
@@ -697,21 +1261,48 @@
         function init() {
             console.log("Initializing application...");
             
+            // Set current year in footer
+            currentYearSpan.textContent = new Date().getFullYear();
+            
+            // Check mobile on load and resize
+            checkMobile();
+            window.addEventListener('resize', checkMobile);
+            
             // Initialize Firebase
             initializeFirebase();
             
-            // Tab switching
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const tabId = tab.getAttribute('data-tab');
+            // Hamburger menu toggle
+            hamburgerMenu.addEventListener('click', toggleSidebar);
+            
+            // Sidebar overlay click to close
+            sidebarOverlay.addEventListener('click', closeSidebarMobile);
+            
+            // Navigation switching
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const tabId = this.getAttribute('data-tab');
                     
-                    tabs.forEach(t => t.classList.remove('active'));
+                    // Handle dark mode toggle separately
+                    if (this.id === 'dark-mode-toggle-sidebar') {
+                        toggleDarkMode();
+                        return;
+                    }
+                    
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
                     tabContents.forEach(tc => tc.classList.remove('active'));
-                    
-                    tab.classList.add('active');
                     document.getElementById(tabId).classList.add('active');
+                    
+                    // Close sidebar on mobile after selection
+                    closeSidebarMobile();
                 });
             });
+            
+            // Dark mode toggle
+            darkModeToggle.addEventListener('click', toggleDarkMode);
+            darkModeToggleSidebar.addEventListener('click', toggleDarkMode);
             
             // Language tab switching
             languageTabs.forEach(tab => {
@@ -735,9 +1326,13 @@
             // Save operation
             saveOperationBtn.addEventListener('click', saveOperation);
             
+            // Save location
+            saveLocationBtn.addEventListener('click', saveLocation);
+            
             // Filter events
             taskFilterIsland.addEventListener('change', renderTaskLogs);
             operationFilterIsland.addEventListener('change', renderOperationLogs);
+            locationFilterIsland.addEventListener('change', renderLocationLogs);
             
             // Modal events
             closeModalBtn.addEventListener('click', () => {
@@ -753,7 +1348,38 @@
                 }
             });
             
+            // Check for saved dark mode preference
+            if (localStorage.getItem('darkMode') === 'enabled') {
+                document.body.classList.add('dark-mode');
+                updateDarkModeToggle(true);
+            }
+            
             console.log("Application initialized");
+        }
+        
+        // Toggle dark mode
+        function toggleDarkMode() {
+            const isDarkMode = document.body.classList.toggle('dark-mode');
+            
+            // Update toggle button text and icon
+            updateDarkModeToggle(isDarkMode);
+            
+            // Save preference to localStorage
+            localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+            
+            showToast(isDarkMode ? 'Dark mode enabled' : 'Light mode enabled');
+        }
+        
+        // Update dark mode toggle button
+        function updateDarkModeToggle(isDarkMode) {
+            const icon = isDarkMode ? 'sun' : 'moon';
+            const text = isDarkMode ? 'Light Mode' : 'Dark Mode';
+            
+            // Update header toggle
+            darkModeToggle.innerHTML = `<i class="fas fa-${icon}"></i><span>${text}</span>`;
+            
+            // Update sidebar toggle
+            darkModeToggleSidebar.innerHTML = `<i class="fas fa-${icon}"></i><span>${text}</span>`;
         }
         
         // Show toast notification
@@ -847,6 +1473,44 @@
                 });
         }
         
+        // Save a new location
+        function saveLocation() {
+            const island = locationIslandSelect.value;
+            const locationName = locationNameInput.value.trim();
+            const remarks = locationRemarksInput.value.trim();
+            
+            if (!island || !locationName || !remarks) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            const newLocation = {
+                island: island,
+                locationName: locationName,
+                remarks: remarks,
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log("Saving location to Firebase:", newLocation);
+            
+            // Save to Firebase
+            locationLogsRef.push(newLocation)
+                .then(() => {
+                    console.log("Location saved successfully");
+                    
+                    // Reset form
+                    locationIslandSelect.value = '';
+                    locationNameInput.value = '';
+                    locationRemarksInput.value = '';
+                    
+                    showToast('Location saved successfully!');
+                })
+                .catch((error) => {
+                    console.error('Error saving location:', error);
+                    alert('Error saving location. Please check console for details.');
+                });
+        }
+        
         // Render task logs
         function renderTaskLogs() {
             const filterIsland = taskFilterIsland.value;
@@ -861,7 +1525,7 @@
             if (taskLogs.length === 0) {
                 taskLogContainer.innerHTML = `
                     <div class="empty-state">
-                        <div>📝</div>
+                        <i class="fas fa-tasks"></i>
                         <p>No task logs found. ${filterIsland ? 'Try changing the filter.' : 'Create your first task!'}</p>
                     </div>
                 `;
@@ -871,7 +1535,7 @@
             if (filteredTasks.length === 0) {
                 taskLogContainer.innerHTML = `
                     <div class="empty-state">
-                        <div>📝</div>
+                        <i class="fas fa-filter"></i>
                         <p>No tasks found for selected island. Try changing the filter.</p>
                     </div>
                 `;
@@ -901,9 +1565,15 @@
                         <div class="service-number">Service Number: ${escapeHtml(log.serviceNumber)}</div>
                         ${messageHtml}
                         <div class="log-actions">
-                            <button class="action-btn copy-btn" onclick="copyToClipboard('${escapeHtml(log.messageEn || '')}', '${escapeHtml(log.messageDv || '')}')">Copy</button>
-                            <button class="action-btn edit-btn" onclick="openEditModal('${log.id}', 'task')">Edit</button>
-                            <button class="action-btn delete-btn" onclick="deleteLog('${log.id}', 'task')">Delete</button>
+                            <button class="action-btn copy-btn" onclick="copyToClipboard('${escapeHtml(log.messageEn || '')}', '${escapeHtml(log.messageDv || '')}')">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                            <button class="action-btn edit-btn" onclick="openEditModal('${log.id}', 'task')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="action-btn delete-btn" onclick="deleteLog('${log.id}', 'task')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
                         </div>
                     </div>
                 `;
@@ -924,7 +1594,7 @@
             if (operationLogs.length === 0) {
                 operationLogContainer.innerHTML = `
                     <div class="empty-state">
-                        <div>🔍</div>
+                        <i class="fas fa-search"></i>
                         <p>No operation logs found. ${filterIsland ? 'Try changing the filter.' : 'Create your first operation!'}</p>
                     </div>
                 `;
@@ -934,7 +1604,7 @@
             if (filteredOperations.length === 0) {
                 operationLogContainer.innerHTML = `
                     <div class="empty-state">
-                        <div>🔍</div>
+                        <i class="fas fa-filter"></i>
                         <p>No operations found for selected island. Try changing the filter.</p>
                     </div>
                 `;
@@ -956,7 +1626,7 @@
                 }
                 
                 return `
-                    <div class="log-item">
+                    <div class="log-item operation-log-item">
                         <div class="log-header">
                             <span class="island-name">${escapeHtml(log.island)}</span>
                             <span class="timestamp">${timestamp}</span>
@@ -964,9 +1634,76 @@
                         <div class="service-number">Service Number: ${escapeHtml(log.serviceNumber)}</div>
                         ${messageHtml}
                         <div class="log-actions">
-                            <button class="action-btn copy-btn" onclick="copyToClipboard('${escapeHtml(log.messageEn || '')}', '${escapeHtml(log.messageDv || '')}')">Copy</button>
-                            <button class="action-btn edit-btn" onclick="openEditModal('${log.id}', 'operation')">Edit</button>
-                            <button class="action-btn delete-btn" onclick="deleteLog('${log.id}', 'operation')">Delete</button>
+                            <button class="action-btn copy-btn" onclick="copyToClipboard('${escapeHtml(log.messageEn || '')}', '${escapeHtml(log.messageDv || '')}')">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                            <button class="action-btn edit-btn" onclick="openEditModal('${log.id}', 'operation')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="action-btn delete-btn" onclick="deleteLog('${log.id}', 'operation')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Render location logs
+        function renderLocationLogs() {
+            const filterIsland = locationFilterIsland.value;
+            const filteredLocations = filterIsland ? 
+                locationLogs.filter(location => location.island === filterIsland) : 
+                locationLogs;
+            
+            // Update counts
+            locationTotalCount.textContent = `Total Locations: ${locationLogs.length}`;
+            locationFilteredCount.textContent = `Filtered: ${filteredLocations.length}`;
+            
+            if (locationLogs.length === 0) {
+                locationLogContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <p>No location logs found. ${filterIsland ? 'Try changing the filter.' : 'Create your first location!'}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            if (filteredLocations.length === 0) {
+                locationLogContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-filter"></i>
+                        <p>No locations found for selected island. Try changing the filter.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            locationLogContainer.innerHTML = filteredLocations.map(log => {
+                const timestamp = new Date(log.timestamp).toLocaleString();
+                
+                return `
+                    <div class="log-item location-log-item">
+                        <div class="log-header">
+                            <span class="island-name">${escapeHtml(log.island)}</span>
+                            <span class="timestamp">${timestamp}</span>
+                        </div>
+                        <div class="location-name"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(log.locationName)}</div>
+                        <div class="log-message">${escapeHtml(log.remarks)}</div>
+                        <div class="log-actions">
+                            <button class="action-btn copy-location-btn" onclick="copySingleToClipboard('${escapeHtml(log.locationName)}', 'Location Name')">
+                                <i class="fas fa-copy"></i> Copy Location
+                            </button>
+                            <button class="action-btn copy-remarks-btn" onclick="copySingleToClipboard('${escapeHtml(log.remarks)}', 'Remarks')">
+                                <i class="fas fa-copy"></i> Copy Remarks
+                            </button>
+                            <button class="action-btn edit-btn" onclick="openEditModal('${log.id}', 'location')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="action-btn delete-btn" onclick="deleteLog('${log.id}', 'location')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
                         </div>
                     </div>
                 `;
@@ -1008,73 +1745,130 @@
             });
         }
         
+        // Copy single item to clipboard
+        function copySingleToClipboard(text, itemName) {
+            if (!text) {
+                showToast('Nothing to copy!');
+                return;
+            }
+            
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(`${itemName} copied to clipboard!`);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showToast(`${itemName} copied to clipboard!`);
+            });
+        }
+        
         // Open edit modal
         function openEditModal(id, type) {
             currentEditId = id;
             currentEditType = type;
             
-            const logs = type === 'task' ? taskLogs : operationLogs;
-            const log = logs.find(l => l.id === id);
+            let log;
+            if (type === 'task') {
+                log = taskLogs.find(l => l.id === id);
+            } else if (type === 'operation') {
+                log = operationLogs.find(l => l.id === id);
+            } else if (type === 'location') {
+                log = locationLogs.find(l => l.id === id);
+            }
             
             if (log) {
-                editIsland.value = log.island;
-                editServiceNumber.value = log.serviceNumber;
-                editMessageEnInput.value = log.messageEn || '';
-                editMessageDvInput.value = log.messageDv || '';
+                if (type === 'location') {
+                    editModalTitle.textContent = 'Edit Location Entry';
+                    editLocationFields.style.display = 'block';
+                    editTaskFields.style.display = 'none';
+                    
+                    editIsland.value = log.island;
+                    editLocationName.value = log.locationName || '';
+                    editLocationRemarks.value = log.remarks || '';
+                } else {
+                    editModalTitle.textContent = type === 'task' ? 'Edit Task Entry' : 'Edit Operation Entry';
+                    editLocationFields.style.display = 'none';
+                    editTaskFields.style.display = 'block';
+                    
+                    editIslandTask.value = log.island;
+                    editServiceNumberTask.value = log.serviceNumber || '';
+                    editMessageEnInput.value = log.messageEn || '';
+                    editMessageDvInput.value = log.messageDv || '';
+                }
                 editModal.style.display = 'flex';
             }
         }
         
         // Update log entry
         function updateLog() {
-            const island = editIsland.value;
-            const serviceNumber = editServiceNumber.value.trim();
-            const messageEn = editMessageEnInput.value.trim();
-            const messageDv = editMessageDvInput.value.trim();
-            
-            if (!island || !serviceNumber || (!messageEn && !messageDv)) {
-                alert('Please fill in all required fields.');
-                return;
-            }
-            
-            const updatedLog = {
-                island: island,
-                serviceNumber: serviceNumber,
-                messageEn: messageEn,
-                messageDv: messageDv,
-                timestamp: new Date().toISOString()
-            };
-            
-            console.log("Updating log:", currentEditId, updatedLog);
-            
-            try {
-                if (currentEditType === 'task') {
-                    // Update in Firebase
-                    taskLogsRef.child(currentEditId).update(updatedLog)
-                        .then(() => {
-                            editModal.style.display = 'none';
-                            showToast('Log updated successfully!');
-                        })
-                        .catch(error => {
-                            console.error('Error updating log:', error);
-                            alert('Error updating log. Please check console for details.');
-                        });
-                } else {
-                    // Update in Firebase
-                    operationLogsRef.child(currentEditId).update(updatedLog)
-                        .then(() => {
-                            editModal.style.display = 'none';
-                            showToast('Log updated successfully!');
-                        })
-                        .catch(error => {
-                            console.error('Error updating log:', error);
-                            alert('Error updating log. Please check console for details.');
-                        });
+            if (currentEditType === 'location') {
+                const island = editIsland.value;
+                const locationName = editLocationName.value.trim();
+                const remarks = editLocationRemarks.value.trim();
+                
+                if (!island || !locationName || !remarks) {
+                    alert('Please fill in all required fields.');
+                    return;
                 }
                 
-            } catch (error) {
-                console.error('Error updating log:', error);
-                alert('Error updating log. Please check console for details.');
+                const updatedLog = {
+                    island: island,
+                    locationName: locationName,
+                    remarks: remarks,
+                    timestamp: new Date().toISOString()
+                };
+                
+                console.log("Updating location:", currentEditId, updatedLog);
+                
+                // Update in Firebase
+                locationLogsRef.child(currentEditId).update(updatedLog)
+                    .then(() => {
+                        editModal.style.display = 'none';
+                        showToast('Location updated successfully!');
+                    })
+                    .catch(error => {
+                        console.error('Error updating location:', error);
+                        alert('Error updating location. Please check console for details.');
+                    });
+                    
+            } else {
+                const island = editIslandTask.value;
+                const serviceNumber = editServiceNumberTask.value.trim();
+                const messageEn = editMessageEnInput.value.trim();
+                const messageDv = editMessageDvInput.value.trim();
+                
+                if (!island || !serviceNumber || (!messageEn && !messageDv)) {
+                    alert('Please fill in all required fields.');
+                    return;
+                }
+                
+                const updatedLog = {
+                    island: island,
+                    serviceNumber: serviceNumber,
+                    messageEn: messageEn,
+                    messageDv: messageDv,
+                    timestamp: new Date().toISOString()
+                };
+                
+                console.log("Updating log:", currentEditId, updatedLog);
+                
+                const ref = currentEditType === 'task' ? taskLogsRef : operationLogsRef;
+                
+                // Update in Firebase
+                ref.child(currentEditId).update(updatedLog)
+                    .then(() => {
+                        editModal.style.display = 'none';
+                        showToast('Log updated successfully!');
+                    })
+                    .catch(error => {
+                        console.error('Error updating log:', error);
+                        alert('Error updating log. Please check console for details.');
+                    });
             }
         }
         
@@ -1087,27 +1881,24 @@
             console.log("Deleting log:", id, type);
             
             try {
+                let ref;
                 if (type === 'task') {
-                    // Delete from Firebase
-                    taskLogsRef.child(id).remove()
-                        .then(() => {
-                            showToast('Log deleted successfully!');
-                        })
-                        .catch(error => {
-                            console.error('Error deleting log:', error);
-                            alert('Error deleting log. Please check console for details.');
-                        });
-                } else {
-                    // Delete from Firebase
-                    operationLogsRef.child(id).remove()
-                        .then(() => {
-                            showToast('Log deleted successfully!');
-                        })
-                        .catch(error => {
-                            console.error('Error deleting log:', error);
-                            alert('Error deleting log. Please check console for details.');
-                        });
+                    ref = taskLogsRef;
+                } else if (type === 'operation') {
+                    ref = operationLogsRef;
+                } else if (type === 'location') {
+                    ref = locationLogsRef;
                 }
+                
+                // Delete from Firebase
+                ref.child(id).remove()
+                    .then(() => {
+                        showToast('Log deleted successfully!');
+                    })
+                    .catch(error => {
+                        console.error('Error deleting log:', error);
+                        alert('Error deleting log. Please check console for details.');
+                    });
                 
             } catch (error) {
                 console.error('Error deleting log:', error);
